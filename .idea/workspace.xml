@@ -4,14 +4,194 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="260f6228-9afc-4530-8118-cc221fcfaacc" name="Changes" comment="" />
+    <list default="true" id="260f6228-9afc-4530-8118-cc221fcfaacc" name="Changes" comment="Install Laravel React Template">
+      <change beforePath="$PROJECT_DIR$/Planet/.cursor/mcp.json" beforeDir="false" afterPath="$PROJECT_DIR$/.cursor/mcp.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/.cursor/rules/laravel-boost.mdc" beforeDir="false" afterPath="$PROJECT_DIR$/.cursor/rules/laravel-boost.mdc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/.editorconfig" beforeDir="false" afterPath="$PROJECT_DIR$/.editorconfig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/.env.example" beforeDir="false" afterPath="$PROJECT_DIR$/.env.example" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/.gitattributes" beforeDir="false" afterPath="$PROJECT_DIR$/.gitattributes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/.github/workflows/lint.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/lint.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/.github/workflows/tests.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/tests.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/.junie/guidelines.md" beforeDir="false" afterPath="$PROJECT_DIR$/.junie/guidelines.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/.junie/mcp/mcp.json" beforeDir="false" afterPath="$PROJECT_DIR$/.junie/mcp/mcp.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/.mcp.json" beforeDir="false" afterPath="$PROJECT_DIR$/.mcp.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/.prettierignore" beforeDir="false" afterPath="$PROJECT_DIR$/.prettierignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/.prettierrc" beforeDir="false" afterPath="$PROJECT_DIR$/.prettierrc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/CLAUDE.md" beforeDir="false" afterPath="$PROJECT_DIR$/CLAUDE.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/app/Actions/Fortify/CreateNewUser.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Actions/Fortify/CreateNewUser.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/app/Actions/Fortify/PasswordValidationRules.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Actions/Fortify/PasswordValidationRules.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/app/Actions/Fortify/ResetUserPassword.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Actions/Fortify/ResetUserPassword.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/app/Http/Controllers/Controller.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Controller.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/app/Http/Controllers/Settings/PasswordController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Settings/PasswordController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/app/Http/Controllers/Settings/ProfileController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Settings/ProfileController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/app/Http/Controllers/Settings/TwoFactorAuthenticationController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Settings/TwoFactorAuthenticationController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/app/Http/Middleware/HandleAppearance.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Middleware/HandleAppearance.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/app/Http/Middleware/HandleInertiaRequests.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Middleware/HandleInertiaRequests.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/app/Http/Requests/Settings/ProfileUpdateRequest.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Requests/Settings/ProfileUpdateRequest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/app/Http/Requests/Settings/TwoFactorAuthenticationRequest.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Requests/Settings/TwoFactorAuthenticationRequest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/app/Models/User.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/User.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/app/Providers/AppServiceProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Providers/AppServiceProvider.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/app/Providers/FortifyServiceProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Providers/FortifyServiceProvider.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/artisan" beforeDir="false" afterPath="$PROJECT_DIR$/artisan" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/boost.json" beforeDir="false" afterPath="$PROJECT_DIR$/boost.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/bootstrap/app.php" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/app.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/bootstrap/cache/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/cache/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/bootstrap/providers.php" beforeDir="false" afterPath="$PROJECT_DIR$/bootstrap/providers.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/components.json" beforeDir="false" afterPath="$PROJECT_DIR$/components.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/composer.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/composer.lock" beforeDir="false" afterPath="$PROJECT_DIR$/composer.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/config/app.php" beforeDir="false" afterPath="$PROJECT_DIR$/config/app.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/config/auth.php" beforeDir="false" afterPath="$PROJECT_DIR$/config/auth.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/config/cache.php" beforeDir="false" afterPath="$PROJECT_DIR$/config/cache.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/config/database.php" beforeDir="false" afterPath="$PROJECT_DIR$/config/database.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/config/filesystems.php" beforeDir="false" afterPath="$PROJECT_DIR$/config/filesystems.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/config/fortify.php" beforeDir="false" afterPath="$PROJECT_DIR$/config/fortify.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/config/inertia.php" beforeDir="false" afterPath="$PROJECT_DIR$/config/inertia.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/config/logging.php" beforeDir="false" afterPath="$PROJECT_DIR$/config/logging.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/config/mail.php" beforeDir="false" afterPath="$PROJECT_DIR$/config/mail.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/config/queue.php" beforeDir="false" afterPath="$PROJECT_DIR$/config/queue.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/config/services.php" beforeDir="false" afterPath="$PROJECT_DIR$/config/services.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/config/session.php" beforeDir="false" afterPath="$PROJECT_DIR$/config/session.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/database/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/database/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/database/factories/UserFactory.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/factories/UserFactory.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/database/migrations/0001_01_01_000000_create_users_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/0001_01_01_000000_create_users_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/database/migrations/0001_01_01_000001_create_cache_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/0001_01_01_000001_create_cache_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/database/migrations/0001_01_01_000002_create_jobs_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/0001_01_01_000002_create_jobs_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/database/migrations/2025_08_26_100418_add_two_factor_columns_to_users_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2025_08_26_100418_add_two_factor_columns_to_users_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/database/seeders/DatabaseSeeder.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/seeders/DatabaseSeeder.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/eslint.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/eslint.config.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/phpunit.xml" beforeDir="false" afterPath="$PROJECT_DIR$/phpunit.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/public/.htaccess" beforeDir="false" afterPath="$PROJECT_DIR$/public/.htaccess" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/public/apple-touch-icon.png" beforeDir="false" afterPath="$PROJECT_DIR$/public/apple-touch-icon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/public/favicon.ico" beforeDir="false" afterPath="$PROJECT_DIR$/public/favicon.ico" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/public/favicon.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/favicon.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/public/index.php" beforeDir="false" afterPath="$PROJECT_DIR$/public/index.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/public/logo.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/logo.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/public/robots.txt" beforeDir="false" afterPath="$PROJECT_DIR$/public/robots.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/css/app.css" beforeDir="false" afterPath="$PROJECT_DIR$/resources/css/app.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/app.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/app.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/alert-error.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/alert-error.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/app-content.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/app-content.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/app-header.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/app-header.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/app-logo-icon.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/app-logo-icon.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/app-logo.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/app-logo.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/app-shell.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/app-shell.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/app-sidebar-header.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/app-sidebar-header.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/app-sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/app-sidebar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/appearance-dropdown.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/appearance-dropdown.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/appearance-tabs.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/appearance-tabs.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/breadcrumbs.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/breadcrumbs.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/delete-user.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/delete-user.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/heading-small.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/heading-small.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/heading.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/heading.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/icon.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/icon.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/input-error.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/input-error.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/nav-footer.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/nav-footer.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/nav-main.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/nav-main.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/nav-user.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/nav-user.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/text-link.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/text-link.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/two-factor-recovery-codes.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/two-factor-recovery-codes.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/two-factor-setup-modal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/two-factor-setup-modal.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/ui/alert.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/ui/alert.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/ui/avatar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/ui/avatar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/ui/badge.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/ui/badge.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/ui/breadcrumb.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/ui/breadcrumb.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/ui/button.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/ui/button.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/ui/card.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/ui/card.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/ui/checkbox.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/ui/checkbox.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/ui/collapsible.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/ui/collapsible.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/ui/dialog.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/ui/dialog.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/ui/dropdown-menu.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/ui/dropdown-menu.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/ui/icon.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/ui/icon.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/ui/input-otp.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/ui/input-otp.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/ui/input.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/ui/input.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/ui/label.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/ui/label.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/ui/navigation-menu.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/ui/navigation-menu.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/ui/placeholder-pattern.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/ui/placeholder-pattern.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/ui/select.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/ui/select.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/ui/separator.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/ui/separator.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/ui/sheet.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/ui/sheet.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/ui/sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/ui/sidebar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/ui/skeleton.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/ui/skeleton.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/ui/spinner.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/ui/spinner.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/ui/toggle-group.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/ui/toggle-group.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/ui/toggle.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/ui/toggle.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/ui/tooltip.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/ui/tooltip.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/user-info.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/user-info.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/components/user-menu-content.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/user-menu-content.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/hooks/use-appearance.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/hooks/use-appearance.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/hooks/use-clipboard.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/hooks/use-clipboard.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/hooks/use-initials.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/hooks/use-initials.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/hooks/use-mobile-navigation.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/hooks/use-mobile-navigation.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/hooks/use-mobile.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/hooks/use-mobile.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/hooks/use-two-factor-auth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/hooks/use-two-factor-auth.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/layouts/app-layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/layouts/app-layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/layouts/app/app-header-layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/layouts/app/app-header-layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/layouts/app/app-sidebar-layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/layouts/app/app-sidebar-layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/layouts/auth-layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/layouts/auth-layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/layouts/auth/auth-card-layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/layouts/auth/auth-card-layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/layouts/auth/auth-simple-layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/layouts/auth/auth-simple-layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/layouts/auth/auth-split-layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/layouts/auth/auth-split-layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/layouts/settings/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/layouts/settings/layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/lib/utils.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/lib/utils.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/pages/auth/confirm-password.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/auth/confirm-password.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/pages/auth/forgot-password.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/auth/forgot-password.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/pages/auth/login.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/auth/login.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/pages/auth/register.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/auth/register.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/pages/auth/reset-password.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/auth/reset-password.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/pages/auth/two-factor-challenge.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/auth/two-factor-challenge.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/pages/auth/verify-email.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/auth/verify-email.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/pages/dashboard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/dashboard.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/pages/settings/appearance.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/settings/appearance.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/pages/settings/password.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/settings/password.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/pages/settings/profile.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/settings/profile.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/pages/settings/two-factor.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/settings/two-factor.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/pages/welcome.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/welcome.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/ssr.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/ssr.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/types/index.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/types/index.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/js/types/vite-env.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/types/vite-env.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/resources/views/app.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/app.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/routes/console.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/console.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/routes/settings.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/settings.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/routes/web.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/web.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/storage/app/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/storage/app/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/storage/app/private/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/storage/app/private/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/storage/app/public/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/storage/app/public/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/storage/framework/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/storage/framework/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/storage/framework/cache/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/storage/framework/cache/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/storage/framework/cache/data/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/storage/framework/cache/data/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/storage/framework/sessions/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/storage/framework/sessions/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/storage/framework/testing/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/storage/framework/testing/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/storage/framework/views/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/storage/framework/views/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/storage/logs/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/storage/logs/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/tests/Feature/Auth/AuthenticationTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Feature/Auth/AuthenticationTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/tests/Feature/Auth/EmailVerificationTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Feature/Auth/EmailVerificationTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/tests/Feature/Auth/PasswordConfirmationTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Feature/Auth/PasswordConfirmationTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/tests/Feature/Auth/PasswordResetTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Feature/Auth/PasswordResetTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/tests/Feature/Auth/RegistrationTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Feature/Auth/RegistrationTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/tests/Feature/Auth/TwoFactorChallengeTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Feature/Auth/TwoFactorChallengeTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/tests/Feature/Auth/VerificationNotificationTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Feature/Auth/VerificationNotificationTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/tests/Feature/DashboardTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Feature/DashboardTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/tests/Feature/Settings/PasswordUpdateTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Feature/Settings/PasswordUpdateTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/tests/Feature/Settings/ProfileUpdateTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Feature/Settings/ProfileUpdateTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/tests/Feature/Settings/TwoFactorAuthenticationTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Feature/Settings/TwoFactorAuthenticationTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/tests/TestCase.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/TestCase.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/tests/Unit/ExampleTest.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Unit/ExampleTest.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/tsconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/tsconfig.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Planet/vite.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/vite.config.ts" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="ComposerSettings">
-    <execution />
+    <execution>
+      <executable path="composer" />
+    </execution>
   </component>
   <component name="EmbeddingIndexingInfo">
     <option name="cachedIndexableFilesCount" value="6" />
@@ -20,6 +200,12 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/hokesen/Planet.git",
+    "accountId": "7eb7fcbf-4eea-413c-bd80-4381fe263c5d"
+  }
+}]]></component>
   <component name="McpProjectServerCommands">
     <commands />
     <urls />
@@ -34,23 +220,24 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/simon/dev/Planet&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Composer Script.dev.executor": "Run",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "/Users/simon/dev/Planet",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RunManager">
     <configuration name="dev" type="ComposerRunConfigurationType" factoryName="Composer Script">
       <option name="commandLineParameters" value="" />
@@ -77,11 +264,24 @@
       <updated>1766441299164</updated>
       <workItem from="1766441300875" duration="42000" />
       <workItem from="1766441376533" duration="96000" />
-      <workItem from="1766441537817" duration="715000" />
+      <workItem from="1766441537817" duration="1057000" />
     </task>
+    <task id="LOCAL-00001" summary="Install Laravel React Template">
+      <option name="closed" value="true" />
+      <created>1766442415077</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1766442415077</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Install Laravel React Template" />
+    <option name="LAST_COMMIT_MESSAGE" value="Install Laravel React Template" />
   </component>
 </project>

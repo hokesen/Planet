@@ -4,9 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="260f6228-9afc-4530-8118-cc221fcfaacc" name="Changes" comment="Extract folder">
-      <change beforePath="$PROJECT_DIR$/.idea/php.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/php.xml" afterDir="false" />
+    <list default="true" id="260f6228-9afc-4530-8118-cc221fcfaacc" name="Changes" comment="Update CLAUDE.md">
+      <change afterPath="$PROJECT_DIR$/resources/js/components/three-body-animation.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/css/app.css" beforeDir="false" afterPath="$PROJECT_DIR$/resources/css/app.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/hooks/use-mobile.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/hooks/use-mobile.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/pages/welcome.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/welcome.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -82,6 +85,7 @@
     "nodejs_package_manager_path": "npm",
     "settings.editor.selected.configurable": "ml.llm.LLMConfigurable",
     "to.speed.mode.migration.done": "true",
+    "ts.external.directory.path": "/Users/simon/dev/Planet/node_modules/typescript/lib",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -116,7 +120,7 @@
       <updated>1766441299164</updated>
       <workItem from="1766441300875" duration="42000" />
       <workItem from="1766441376533" duration="96000" />
-      <workItem from="1766441537817" duration="2021000" />
+      <workItem from="1766441537817" duration="3950000" />
     </task>
     <task id="LOCAL-00001" summary="Install Laravel React Template">
       <option name="closed" value="true" />
@@ -134,7 +138,15 @@
       <option name="project" value="LOCAL" />
       <updated>1766442631223</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Update CLAUDE.md">
+      <option name="closed" value="true" />
+      <created>1766443927015</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1766443927015</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -143,7 +155,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Install Laravel React Template" />
     <MESSAGE value="Extract folder" />
-    <option name="LAST_COMMIT_MESSAGE" value="Extract folder" />
+    <MESSAGE value="Update CLAUDE.md" />
+    <option name="LAST_COMMIT_MESSAGE" value="Update CLAUDE.md" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

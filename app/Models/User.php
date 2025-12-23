@@ -49,4 +49,24 @@ class User extends Authenticatable
             'two_factor_confirmed_at' => 'datetime',
         ];
     }
+
+    public function galaxies()
+    {
+        return $this->hasMany(Galaxy::class);
+    }
+
+    public function planets()
+    {
+        return $this->hasMany(Planet::class);
+    }
+
+    public function missions()
+    {
+        return $this->hasMany(Mission::class);
+    }
+
+    public function capacitySettings()
+    {
+        return $this->hasOne(UserCapacitySetting::class);
+    }
 }

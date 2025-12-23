@@ -24,10 +24,10 @@ export function setupScene(canvas: HTMLCanvasElement): SceneComponents {
     const rect = canvas.getBoundingClientRect();
     const aspect = rect.width / rect.height;
 
-    // Create camera (fixed cinematic angle)
+    // Create camera (fixed cinematic angle, angled down 10 degrees)
     const camera = new THREE.PerspectiveCamera(50, aspect, 0.1, 2000);
-    camera.position.set(150, 100, 150); // Elevated 3/4 view
-    camera.lookAt(0, 0, 0); // Look at origin (home base)
+    camera.position.set(150, 80, 150); // Lower Y for downward angle
+    camera.lookAt(0, -10, 0); // Look slightly below origin for 10-degree downward tilt
 
     // Create renderer
     const renderer = new THREE.WebGLRenderer({
@@ -107,95 +107,92 @@ export function addStarfield(scene: THREE.Scene): void {
 }
 
 /**
- * Create animated rainbow material
+ * Create text sprite label for wormhole
  */
-function createRainbowMaterial(): THREE.MeshStandardMaterial {
-    // Start with a vibrant purple-pink
-    const material = new THREE.MeshStandardMaterial({
-        color: 0xff00ff,
-        emissive: 0xff00ff,
-        emissiveIntensity: 0.6,
-        metalness: 0.9,
-        roughness: 0.1,
-        opacity: 1.0, // Fully opaque
-        transparent: false,
-    });
-
-    return material;
-}
-
-/**
- * Create text sprite label
- */
-function createHomeLabel(): THREE.Sprite {
+function createWormholeLabel(): THREE.Sprite {
     const canvas = document.createElement('canvas');
     const context = canvas.getContext('2d')!;
 
     canvas.width = 512;
     canvas.height = 128;
 
-    context.font = 'Bold 60px Arial';
+    context.font = 'Bold 48px Arial';
     context.fillStyle = '#ffffff';
     context.textAlign = 'center';
     context.textBaseline = 'middle';
-    context.fillText('Home', canvas.width / 2, canvas.height / 2);
+    context.fillText('Refueling Wormhole', canvas.width / 2, canvas.height / 2);
 
     const texture = new THREE.CanvasTexture(canvas);
     const material = new THREE.SpriteMaterial({ map: texture, transparent: true });
     const sprite = new THREE.Sprite(material);
-    sprite.scale.set(25, 6.25, 1);
+    sprite.scale.set(40, 10, 1);
 
     return sprite;
 }
 
 /**
- * Add home base object at origin
+ * Add wormhole (refueling station) at origin
  */
-export function addHomeBase(scene: THREE.Scene): THREE.Mesh {
-    const geometry = new THREE.SphereGeometry(12, 64, 64); // Larger, higher quality
-    const material = createRainbowMaterial();
+export function addHomeBase(scene: THREE.Scene): THREE.Group {
+    const wormholeGroup = new THREE.Group();
+    wormholeGroup.position.set(0, 0, 0);
+    wormholeGroup.userData.type = 'home_base';
 
-    const homeBase = new THREE.Mesh(geometry, material);
-    homeBase.position.set(0, 0, 0);
-    homeBase.userData.type = 'home_base';
-
-    scene.add(homeBase);
-
-    // Add "Home" label above
-    const label = createHomeLabel();
-    label.position.y = 20;
-    homeBase.add(label);
-
-    // Add first rainbow ring
-    const ring1Geometry = new THREE.RingGeometry(15, 17, 128);
-    const ring1Material = new THREE.MeshBasicMaterial({
-        color: 0xff00ff, // Magenta
-        side: THREE.DoubleSide,
+    // Dark center void
+    const voidGeometry = new THREE.SphereGeometry(6, 32, 32);
+    const voidMaterial = new THREE.MeshBasicMaterial({
+        color: 0x000000,
         transparent: true,
-        opacity: 0.7,
+        opacity: 0.9,
     });
-    const ring1 = new THREE.Mesh(ring1Geometry, ring1Material);
-    ring1.rotation.x = Math.PI / 2;
-    homeBase.add(ring1);
+    const voidMesh = new THREE.Mesh(voidGeometry, voidMaterial);
+    wormholeGroup.add(voidMesh);
 
-    // Add second rainbow ring (outer)
-    const ring2Geometry = new THREE.RingGeometry(20, 22, 128);
-    const ring2Material = new THREE.MeshBasicMaterial({
-        color: 0x00ffff, // Cyan
-        side: THREE.DoubleSide,
+    // Create multiple swirling energy rings
+    const rings: THREE.Mesh[] = [];
+    for (let i = 0; i < 5; i++) {
+        const innerRadius = 7 + i * 2;
+        const outerRadius = innerRadius + 1.5;
+        const ringGeometry = new THREE.RingGeometry(innerRadius, outerRadius, 64);
+
+        // Gradient from purple to cyan for wormhole effect
+        const colors = [0x9D00FF, 0x7700FF, 0x4400FF, 0x0088FF, 0x00FFFF];
+        const ringMaterial = new THREE.MeshBasicMaterial({
+            color: colors[i],
+            side: THREE.DoubleSide,
+            transparent: true,
+            opacity: 0.6 - i * 0.1,
+        });
+
+        const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+        ring.rotation.x = Math.PI / 2;
+        ring.rotation.z = (i * Math.PI) / 8; // Offset rotation for swirl effect
+        wormholeGroup.add(ring);
+        rings.push(ring);
+    }
+
+    // Add glow effect around wormhole
+    const glowGeometry = new THREE.SphereGeometry(20, 32, 32);
+    const glowMaterial = new THREE.MeshBasicMaterial({
+        color: 0x4400FF,
         transparent: true,
-        opacity: 0.5,
+        opacity: 0.15,
     });
-    const ring2 = new THREE.Mesh(ring2Geometry, ring2Material);
-    ring2.rotation.x = Math.PI / 2;
-    ring2.rotation.z = Math.PI / 4; // Slight rotation for visual interest
-    homeBase.add(ring2);
+    const glowMesh = new THREE.Mesh(glowGeometry, glowMaterial);
+    wormholeGroup.add(glowMesh);
+
+    // Add "Refueling Wormhole" label above
+    const label = createWormholeLabel();
+    label.position.y = 25;
+    wormholeGroup.add(label);
+
+    scene.add(wormholeGroup);
 
     // Store rings for animation
-    homeBase.userData.rings = [ring1, ring2];
-    homeBase.userData.material = material;
+    wormholeGroup.userData.rings = rings;
+    wormholeGroup.userData.glow = glowMesh;
 
-    return homeBase;
+    return wormholeGroup;
 }
 
 /**

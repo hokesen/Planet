@@ -4,11 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="260f6228-9afc-4530-8118-cc221fcfaacc" name="Changes" comment="Revamp welcome page with three planet animation">
+    <list default="true" id="260f6228-9afc-4530-8118-cc221fcfaacc" name="Changes" comment="planet simulation">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Models/User.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/User.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/pages/dashboard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/dashboard.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/web.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/web.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/space-visualization.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/space-visualization.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/lib/space/interaction-handler.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/lib/space/interaction-handler.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/lib/space/planet-manager.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/lib/space/planet-manager.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/lib/space/procedural-textures.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/lib/space/procedural-textures.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/lib/space/rocket-manager.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/lib/space/rocket-manager.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/lib/space/scene-setup.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/lib/space/scene-setup.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/pages/dashboard-3d.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/dashboard-3d.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/pages/welcome.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/welcome.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/types/space.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/types/space.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -119,7 +125,7 @@
       <updated>1766441299164</updated>
       <workItem from="1766441300875" duration="42000" />
       <workItem from="1766441376533" duration="96000" />
-      <workItem from="1766441537817" duration="5763000" />
+      <workItem from="1766441537817" duration="7605000" />
     </task>
     <task id="LOCAL-00001" summary="Install Laravel React Template">
       <option name="closed" value="true" />
@@ -153,7 +159,15 @@
       <option name="project" value="LOCAL" />
       <updated>1766446365750</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="planet simulation">
+      <option name="closed" value="true" />
+      <created>1766455506702</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1766455506702</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -164,7 +178,8 @@
     <MESSAGE value="Extract folder" />
     <MESSAGE value="Update CLAUDE.md" />
     <MESSAGE value="Revamp welcome page with three planet animation" />
-    <option name="LAST_COMMIT_MESSAGE" value="Revamp welcome page with three planet animation" />
+    <MESSAGE value="planet simulation" />
+    <option name="LAST_COMMIT_MESSAGE" value="planet simulation" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

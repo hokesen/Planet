@@ -10,6 +10,7 @@ import {
 } from '@/lib/space/scene-setup';
 import { PlanetManager } from '@/lib/space/planet-manager';
 import { RocketManager } from '@/lib/space/rocket-manager';
+import { BlackHoleManager } from '@/lib/space/black-hole-manager';
 import { InteractionHandler } from '@/lib/space/interaction-handler';
 import {
     createAllGalaxyBoundaries,
@@ -20,12 +21,16 @@ export interface SpaceVisualizationProps {
     galaxies: Galaxy3D[];
     onRocketClick?: (mission: Mission3D) => void;
     onPlanetClick?: (planet: Planet3D) => void;
+    onGalaxyClick?: (galaxy: Galaxy3D) => void;
+    onWormholeClick?: () => void;
 }
 
 export function SpaceVisualization({
     galaxies,
     onRocketClick,
     onPlanetClick,
+    onGalaxyClick,
+    onWormholeClick,
 }: SpaceVisualizationProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const sceneDataRef = useRef<{
@@ -34,6 +39,7 @@ export function SpaceVisualization({
         renderer: THREE.WebGLRenderer;
         planetManager: PlanetManager;
         rocketManager: RocketManager;
+        blackHoleManager: BlackHoleManager;
         interactionHandler: InteractionHandler;
         galaxyBoundaries: THREE.LineSegments[];
         animationId?: number;
@@ -58,6 +64,10 @@ export function SpaceVisualization({
 
         // Add home base
         addHomeBase(scene);
+
+        // Initialize black hole manager (must be before planet manager)
+        const blackHoleManager = new BlackHoleManager(scene, galaxies);
+        blackHoleManager.initialize();
 
         // Initialize planet manager
         const planetManager = new PlanetManager(scene, galaxies);
@@ -89,6 +99,8 @@ export function SpaceVisualization({
             {
                 onRocketClick,
                 onPlanetClick,
+                onGalaxyClick,
+                onWormholeClick,
             }
         );
 
@@ -102,6 +114,7 @@ export function SpaceVisualization({
             renderer,
             planetManager,
             rocketManager,
+            blackHoleManager,
             interactionHandler,
             galaxyBoundaries,
             lastTime: performance.now(),
@@ -117,26 +130,16 @@ export function SpaceVisualization({
             ); // Cap delta to prevent issues
             sceneDataRef.current.lastTime = currentTime;
 
-            // Slowly rotate camera around home (0,0,0)
-            const cameraRotationSpeed = 0.05; // Slow rotation
-            const currentAngle = Math.atan2(
-                sceneDataRef.current.camera.position.z,
-                sceneDataRef.current.camera.position.x
-            );
-            const newAngle = currentAngle + cameraRotationSpeed * deltaTime;
-            const radius = Math.sqrt(
-                sceneDataRef.current.camera.position.x ** 2 +
-                    sceneDataRef.current.camera.position.z ** 2
-            );
+            // Automatic camera rotation (disabled - manual control takes precedence)
+            // User can now drag to rotate the camera manually
 
-            sceneDataRef.current.camera.position.x = Math.cos(newAngle) * radius;
-            sceneDataRef.current.camera.position.z = Math.sin(newAngle) * radius;
-            sceneDataRef.current.camera.lookAt(0, 0, 0);
+            // Update black holes (rotation, pulsing glow)
+            sceneDataRef.current.blackHoleManager.update(deltaTime);
 
-            // Update planets (rotation, effects)
+            // Update planets (rotation, orbital movement, effects)
             sceneDataRef.current.planetManager.update(deltaTime);
 
-            // Update rockets (orbital animation)
+            // Update rockets (linear travel, path lines)
             sceneDataRef.current.rocketManager.update(deltaTime);
 
             // Render scene
@@ -174,6 +177,7 @@ export function SpaceVisualization({
                     cancelAnimationFrame(sceneDataRef.current.animationId);
                 }
 
+                sceneDataRef.current.blackHoleManager.dispose();
                 sceneDataRef.current.planetManager.dispose();
                 sceneDataRef.current.rocketManager.dispose();
                 sceneDataRef.current.interactionHandler.dispose();

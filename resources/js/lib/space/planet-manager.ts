@@ -1,19 +1,20 @@
 import * as THREE from 'three';
-import type { Galaxy3D, Planet3D, PlanetInstance, Vector3D } from '@/types/space';
+import type { Galaxy3D, Planet3D, PlanetInstance, MoonInstance, Vector3D } from '@/types/space';
 import { getPlanetTexture } from './procedural-textures';
+import { calculateGalaxyCenter } from './black-hole-manager';
 
 /**
- * Get planet radius based on size
+ * Get planet radius based on size (reduced to 1/3 of original)
  */
 export function getPlanetRadius(size: string): number {
     const sizes = {
-        small: 5,
-        medium: 10,
-        large: 18,
-        massive: 25,
+        small: 1.7,
+        medium: 3.3,
+        large: 6,
+        massive: 8.3,
     };
 
-    return sizes[size as keyof typeof sizes] || 10;
+    return sizes[size as keyof typeof sizes] || 3.3;
 }
 
 /**
@@ -25,25 +26,20 @@ export function getOrbitRadius(size: string): number {
 }
 
 /**
- * Generate a distinct color for each planet based on its global index
+ * Generate a randomized color for each planet based on its ID
  */
-function getPlanetColor(globalIndex: number): string {
-    const colors = [
-        '#FF6B6B', // Red
-        '#4ECDC4', // Teal
-        '#FFE66D', // Yellow
-        '#A8DADC', // Light Blue
-        '#FF8C42', // Orange
-        '#95E1D3', // Mint
-        '#F38181', // Pink
-        '#AA96DA', // Purple
-        '#FCBAD3', // Light Pink
-        '#A8E6CF', // Green
-        '#FFD93D', // Gold
-        '#6BCF7F', // Light Green
-    ];
+function getPlanetColor(planetId: number): string {
+    const random = (seed: number) => {
+        const x = Math.sin(seed) * 10000;
+        return x - Math.floor(x);
+    };
 
-    return colors[globalIndex % colors.length];
+    // Generate random HSL values
+    const hue = random(planetId * 12.345) * 360;
+    const saturation = 60 + random(planetId * 23.456) * 30; // 60-90%
+    const lightness = 50 + random(planetId * 34.567) * 20; // 50-70%
+
+    return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 }
 
 /**
@@ -92,14 +88,65 @@ export function autoPositionPlanets(galaxies: Galaxy3D[]): void {
                 planet.orbit_radius = getOrbitRadius(planet.size);
             }
 
-            // Assign a unique color if not set
+            // Assign a unique randomized color if not set
             if (!planet.color) {
-                planet.color = getPlanetColor(globalPlanetIndex);
+                planet.color = getPlanetColor(planet.id);
             }
 
             globalPlanetIndex++;
         });
     });
+}
+
+/**
+ * Get orbital speed based on planet size (smaller planets orbit faster)
+ */
+function getOrbitalSpeed(size: string, distance: number): number {
+    const baseSpeeds = {
+        small: 0.15,
+        medium: 0.12,
+        large: 0.08,
+        massive: 0.05,
+    };
+
+    const baseSpeed = baseSpeeds[size as keyof typeof baseSpeeds] || 0.1;
+    // Adjust speed based on distance (farther = slower, like Kepler's laws)
+    return baseSpeed * (30 / Math.max(distance, 1));
+}
+
+/**
+ * Create a dotted orbit line for a planet
+ */
+function createOrbitLine(
+    center: THREE.Vector3,
+    distance: number,
+    color: string
+): THREE.Line {
+    const points: THREE.Vector3[] = [];
+    const segments = 128;
+
+    for (let i = 0; i <= segments; i++) {
+        const angle = (i / segments) * Math.PI * 2;
+        points.push(new THREE.Vector3(
+            center.x + distance * Math.cos(angle),
+            center.y,
+            center.z + distance * Math.sin(angle)
+        ));
+    }
+
+    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+    const material = new THREE.LineDashedMaterial({
+        color: new THREE.Color(color),
+        dashSize: 2,
+        gapSize: 2,
+        transparent: true,
+        opacity: 0.3,
+    });
+
+    const line = new THREE.Line(geometry, material);
+    line.computeLineDistances(); // Required for dashed lines
+
+    return line;
 }
 
 /**
@@ -184,6 +231,49 @@ export function createPlanet(
 }
 
 /**
+ * Create moons orbiting a planet (0-3 random moons)
+ */
+function createMoons(planetId: number, planetRadius: number): MoonInstance[] {
+    const random = (seed: number) => {
+        const x = Math.sin(seed) * 10000;
+        return x - Math.floor(x);
+    };
+
+    // Determine number of moons (0-3)
+    const moonCount = Math.floor(random(planetId * 45.678) * 4);
+    const moons: MoonInstance[] = [];
+
+    for (let i = 0; i < moonCount; i++) {
+        const moonRadius = 0.3 + random(planetId * 56.789 + i) * 0.5; // 0.3-0.8
+        const moonGeometry = new THREE.SphereGeometry(moonRadius, 16, 16);
+
+        // Random gray color for moon
+        const grayValue = Math.floor(120 + random(planetId * 67.890 + i) * 80);
+        const moonMaterial = new THREE.MeshStandardMaterial({
+            color: new THREE.Color(`rgb(${grayValue}, ${grayValue}, ${grayValue})`),
+            roughness: 0.9,
+            metalness: 0.1,
+        });
+
+        const moonMesh = new THREE.Mesh(moonGeometry, moonMaterial);
+
+        // Orbital parameters
+        const orbitDistance = planetRadius + 5 + i * 3; // Spacing between moons
+        const orbitSpeed = 0.8 - i * 0.2; // Inner moons orbit faster
+        const orbitAngle = random(planetId * 78.901 + i) * Math.PI * 2; // Random start position
+
+        moons.push({
+            mesh: moonMesh,
+            orbitAngle,
+            orbitDistance,
+            orbitSpeed,
+        });
+    }
+
+    return moons;
+}
+
+/**
  * Add visual effects based on planet health status
  */
 export function addPlanetEffects(
@@ -253,6 +343,7 @@ export function addPlanetEffects(
  */
 export class PlanetManager {
     private planets: Map<number, PlanetInstance> = new Map();
+    private galaxyCenters: Map<number, THREE.Vector3> = new Map();
 
     constructor(
         private scene: THREE.Scene,
@@ -266,17 +357,67 @@ export class PlanetManager {
         // Auto-position planets that need it
         autoPositionPlanets(this.galaxies);
 
+        // Calculate and store galaxy centers
+        this.galaxies.forEach((galaxy) => {
+            const center = calculateGalaxyCenter(galaxy);
+            this.galaxyCenters.set(galaxy.id, center);
+        });
+
         // Create planet meshes
         this.galaxies.forEach((galaxy) => {
+            const galaxyCenter = this.galaxyCenters.get(galaxy.id)!;
+
             galaxy.planets.forEach((planet) => {
                 const mesh = createPlanet(planet, galaxy.color);
                 addPlanetEffects(mesh, planet);
 
                 this.scene.add(mesh);
 
+                // Calculate orbit parameters
+                const planetPos = new THREE.Vector3(
+                    planet.position_x || 0,
+                    planet.position_y || 0,
+                    planet.position_z || 0
+                );
+                const orbitDistance = Math.sqrt(
+                    Math.pow(planetPos.x - galaxyCenter.x, 2) +
+                    Math.pow(planetPos.z - galaxyCenter.z, 2)
+                );
+                const orbitAngle = Math.atan2(
+                    planetPos.z - galaxyCenter.z,
+                    planetPos.x - galaxyCenter.x
+                );
+                const orbitSpeed = getOrbitalSpeed(planet.size, orbitDistance);
+
+                // Create orbit line
+                const orbitLine = createOrbitLine(
+                    galaxyCenter,
+                    orbitDistance,
+                    planet.color || galaxy.color
+                );
+                this.scene.add(orbitLine);
+
+                // Create and add moons
+                const radius = getPlanetRadius(planet.size);
+                const moons = createMoons(planet.id, radius);
+                moons.forEach(moon => {
+                    mesh.add(moon.mesh); // Add moon to planet (so it moves with planet)
+                    // Position moon in orbit
+                    moon.mesh.position.set(
+                        moon.orbitDistance * Math.cos(moon.orbitAngle),
+                        0,
+                        moon.orbitDistance * Math.sin(moon.orbitAngle)
+                    );
+                });
+
                 const instance: PlanetInstance = {
                     mesh,
                     planet,
+                    orbitAngle,
+                    orbitDistance,
+                    orbitSpeed,
+                    orbitLine,
+                    moons,
                 };
 
                 this.planets.set(planet.id, instance);
@@ -299,12 +440,46 @@ export class PlanetManager {
     }
 
     /**
-     * Update planet animations (rotation, effects)
+     * Update planet animations (rotation, orbital movement, effects)
      */
     update(deltaTime: number): void {
         this.planets.forEach((instance) => {
-            // Slow rotation on Y axis
+            // Get galaxy center for this planet
+            const galaxyCenter = this.galaxyCenters.get(instance.planet.galaxy_id);
+            if (!galaxyCenter) return;
+
+            // Update orbital position
+            instance.orbitAngle += instance.orbitSpeed * deltaTime;
+
+            // Calculate new position in orbit (circular orbit in XZ plane)
+            const newX = galaxyCenter.x + instance.orbitDistance * Math.cos(instance.orbitAngle);
+            const newZ = galaxyCenter.z + instance.orbitDistance * Math.sin(instance.orbitAngle);
+            const newY = galaxyCenter.y; // Keep Y at galaxy center level
+
+            instance.mesh.position.set(newX, newY, newZ);
+
+            // Update planet data for rocket targeting
+            instance.planet.position_x = newX;
+            instance.planet.position_y = newY;
+            instance.planet.position_z = newZ;
+
+            // Slow rotation on Y axis (planet spinning)
             instance.mesh.rotation.y += 0.1 * deltaTime;
+
+            // Update moon orbits
+            if (instance.moons) {
+                instance.moons.forEach(moon => {
+                    // Update moon orbital angle
+                    moon.orbitAngle += moon.orbitSpeed * deltaTime;
+
+                    // Update moon position around planet
+                    moon.mesh.position.set(
+                        moon.orbitDistance * Math.cos(moon.orbitAngle),
+                        0,
+                        moon.orbitDistance * Math.sin(moon.orbitAngle)
+                    );
+                });
+            }
 
             // Pulse effect for critical planets
             if (instance.planet.health_status === 'critical') {
@@ -324,12 +499,23 @@ export class PlanetManager {
      */
     dispose(): void {
         this.planets.forEach((instance) => {
+            // Dispose planet mesh
             instance.mesh.geometry.dispose();
             if (instance.mesh.material instanceof THREE.Material) {
                 instance.mesh.material.dispose();
             }
             this.scene.remove(instance.mesh);
+
+            // Dispose orbit line
+            if (instance.orbitLine) {
+                instance.orbitLine.geometry.dispose();
+                if (instance.orbitLine.material instanceof THREE.Material) {
+                    instance.orbitLine.material.dispose();
+                }
+                this.scene.remove(instance.orbitLine);
+            }
         });
         this.planets.clear();
+        this.galaxyCenters.clear();
     }
 }

@@ -144,6 +144,31 @@ function createTrail(color: number): THREE.Line {
 }
 
 /**
+ * Create a dotted path line showing rocket's full travel path
+ */
+function createRocketPathLine(
+    homePos: THREE.Vector3,
+    planetPos: THREE.Vector3,
+    color: number
+): THREE.Line {
+    const points: THREE.Vector3[] = [homePos, planetPos];
+
+    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+    const material = new THREE.LineDashedMaterial({
+        color: color,
+        dashSize: 3,
+        gapSize: 2,
+        transparent: true,
+        opacity: 0.4,
+    });
+
+    const line = new THREE.Line(geometry, material);
+    line.computeLineDistances(); // Required for dashed lines
+
+    return line;
+}
+
+/**
  * Rocket Manager class to handle all rocket operations
  */
 export class RocketManager {
@@ -193,6 +218,15 @@ export class RocketManager {
             const trail = createTrail(getPriorityColor(mission.priority));
             this.scene.add(trail);
 
+            // Create dotted path line
+            const homePos = new THREE.Vector3(0, 0, 0);
+            const pathLine = createRocketPathLine(
+                homePos,
+                planetPos,
+                getPriorityColor(mission.priority)
+            );
+            this.scene.add(pathLine);
+
             const instance: RocketInstance = {
                 mesh,
                 mission,
@@ -202,6 +236,7 @@ export class RocketManager {
                 speed,
                 trail,
                 trailPositions: [],
+                pathLine,
                 travelProgress: 0, // Start at home
                 direction: 1, // Moving towards planet
             };
@@ -218,12 +253,21 @@ export class RocketManager {
             // Home base position (origin)
             const homePos = new THREE.Vector3(0, 0, 0);
 
-            // Planet position
+            // Planet position (updated by planet manager as planets orbit)
             const planetPos = new THREE.Vector3(
                 rocket.planet.position_x || 0,
                 rocket.planet.position_y || 0,
                 rocket.planet.position_z || 0
             );
+
+            // Update path line to follow moving planet
+            if (rocket.pathLine) {
+                const positions = rocket.pathLine.geometry.getAttribute('position');
+                positions.setXYZ(0, homePos.x, homePos.y, homePos.z);
+                positions.setXYZ(1, planetPos.x, planetPos.y, planetPos.z);
+                positions.needsUpdate = true;
+                rocket.pathLine.computeLineDistances(); // Recompute for dashed effect
+            }
 
             // Update travel progress
             // Speed is normalized to complete travel in similar time as old orbit
@@ -340,6 +384,15 @@ export class RocketManager {
         const trail = createTrail(getPriorityColor(mission.priority));
         this.scene.add(trail);
 
+        // Create dotted path line
+        const homePos = new THREE.Vector3(0, 0, 0);
+        const pathLine = createRocketPathLine(
+            homePos,
+            planetPos,
+            getPriorityColor(mission.priority)
+        );
+        this.scene.add(pathLine);
+
         const instance: RocketInstance = {
             mesh,
             mission,
@@ -349,6 +402,7 @@ export class RocketManager {
             speed,
             trail,
             trailPositions: [],
+            pathLine,
             travelProgress: 0, // Start at home
             direction: 1, // Moving towards planet
         };
@@ -371,6 +425,15 @@ export class RocketManager {
             rocket.trail.geometry.dispose();
             if (rocket.trail.material instanceof THREE.Material) {
                 rocket.trail.material.dispose();
+            }
+        }
+
+        // Remove path line
+        if (rocket.pathLine) {
+            this.scene.remove(rocket.pathLine);
+            rocket.pathLine.geometry.dispose();
+            if (rocket.pathLine.material instanceof THREE.Material) {
+                rocket.pathLine.material.dispose();
             }
         }
 
@@ -400,6 +463,15 @@ export class RocketManager {
                 rocket.trail.geometry.dispose();
                 if (rocket.trail.material instanceof THREE.Material) {
                     rocket.trail.material.dispose();
+                }
+            }
+
+            // Dispose path line
+            if (rocket.pathLine) {
+                this.scene.remove(rocket.pathLine);
+                rocket.pathLine.geometry.dispose();
+                if (rocket.pathLine.material instanceof THREE.Material) {
+                    rocket.pathLine.material.dispose();
                 }
             }
 

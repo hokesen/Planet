@@ -5,7 +5,7 @@ import { SpaceVisualization } from '@/components/space-visualization';
 import MissionModal from '@/components/mission-modal';
 import PlanetModal from '@/components/planet-modal';
 import GalaxyModal from '@/components/galaxy-modal';
-import CapacityIndicator from '@/components/capacity-indicator';
+import WormholeModal from '@/components/wormhole-modal';
 import { Button } from '@/components/ui/button';
 import type { BreadcrumbItem } from '@/types';
 import type { Galaxy3D, Planet3D, Mission3D } from '@/types/space';
@@ -59,6 +59,7 @@ export default function Dashboard3D({ galaxies, capacity }: Dashboard3DProps) {
     const [showMissionModal, setShowMissionModal] = useState(false);
     const [showPlanetModal, setShowPlanetModal] = useState(false);
     const [showGalaxyModal, setShowGalaxyModal] = useState(false);
+    const [showWormholeModal, setShowWormholeModal] = useState(false);
     const [showFabMenu, setShowFabMenu] = useState(false);
 
     const handleRocketClick = (mission: Mission3D) => {
@@ -69,6 +70,15 @@ export default function Dashboard3D({ galaxies, capacity }: Dashboard3DProps) {
     const handlePlanetClick = (planet: Planet3D) => {
         setSelectedPlanet(planet);
         setShowPlanetModal(true);
+    };
+
+    const handleGalaxyClick = (galaxy: Galaxy3D) => {
+        setSelectedGalaxy(galaxy);
+        setShowGalaxyModal(true);
+    };
+
+    const handleWormholeClick = () => {
+        setShowWormholeModal(true);
     };
 
     const handleCloseMissionModal = () => {
@@ -109,10 +119,9 @@ export default function Dashboard3D({ galaxies, capacity }: Dashboard3DProps) {
                     galaxies={galaxies}
                     onRocketClick={handleRocketClick}
                     onPlanetClick={handlePlanetClick}
+                    onGalaxyClick={handleGalaxyClick}
+                    onWormholeClick={handleWormholeClick}
                 />
-
-                {/* Capacity Indicator - top right */}
-                <CapacityIndicator capacity={capacity} />
 
                 {/* Info overlay - top left */}
                 <div className="absolute left-4 top-4 rounded-lg bg-black/70 p-4 text-white backdrop-blur-lg">
@@ -277,6 +286,13 @@ export default function Dashboard3D({ galaxies, capacity }: Dashboard3DProps) {
                     galaxy={selectedGalaxy}
                     open={showGalaxyModal}
                     onOpenChange={setShowGalaxyModal}
+                />
+
+                <WormholeModal
+                    isOpen={showWormholeModal}
+                    onClose={() => setShowWormholeModal(false)}
+                    galaxies={galaxies}
+                    capacity={capacity}
                 />
             </div>
         </AppLayout>

@@ -50,10 +50,22 @@ export interface SpaceScene {
     stop: () => void;
 }
 
+export interface MoonInstance {
+    mesh: THREE.Mesh;
+    orbitAngle: number;
+    orbitDistance: number;
+    orbitSpeed: number;
+}
+
 export interface PlanetInstance {
     mesh: THREE.Mesh;
     planet: Planet3D;
     label?: THREE.Sprite;
+    orbitAngle: number; // Current angle in orbit (radians)
+    orbitDistance: number; // Distance from galaxy center
+    orbitSpeed: number; // Orbital speed (radians per second)
+    orbitLine?: THREE.Line; // Dotted line showing orbit path
+    moons?: MoonInstance[]; // Moons orbiting this planet
 }
 
 export interface RocketInstance {
@@ -65,6 +77,7 @@ export interface RocketInstance {
     speed: number;
     trail?: THREE.Line;
     trailPositions?: THREE.Vector3[];
+    pathLine?: THREE.Line; // Dotted line showing full travel path
     travelProgress: number; // 0-1 progress from home to planet
     direction: 1 | -1; // 1 = towards planet, -1 = towards home
 }

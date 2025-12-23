@@ -47,7 +47,7 @@ export default function Welcome({
                     <main className="flex w-full max-w-[335px] flex-col-reverse lg:max-w-4xl lg:flex-row">
                         <div className="flex-1 rounded-br-lg rounded-bl-lg bg-[#161615]/80 p-6 pb-12 text-[13px] leading-[20px] shadow-[inset_0px_0px_0px_1px_rgba(255,255,255,0.1)] backdrop-blur-sm lg:rounded-tl-lg lg:rounded-br-none lg:p-20">
                             <h1 className="mb-1 text-2xl font-medium text-white">
-                                Planet
+                                Simon's Planet
                             </h1>
                             <p className="mb-2 text-white/70">
                                 Build your universe, one planet at a time. Watch

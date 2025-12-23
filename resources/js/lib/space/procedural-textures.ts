@@ -116,16 +116,44 @@ interface TerrainColor {
     b: number;
 }
 
-const TERRAIN_COLORS = {
-    deepOcean: { r: 15, g: 50, b: 90 },      // Deep blue
-    ocean: { r: 30, g: 80, b: 150 },         // Ocean blue
-    shallowOcean: { r: 50, g: 120, b: 180 }, // Light blue
-    beach: { r: 194, g: 178, b: 128 },       // Sandy
-    lowland: { r: 80, g: 140, b: 60 },       // Green
-    highland: { r: 100, g: 120, b: 70 },     // Dark green
-    mountain: { r: 120, g: 110, b: 100 },    // Brown/gray
-    snowCap: { r: 240, g: 245, b: 250 },     // White/ice
-};
+/**
+ * Generate randomized terrain colors based on planet seed
+ */
+function generateTerrainColors(seed: number) {
+    const random = (s: number) => {
+        const x = Math.sin(s) * 10000;
+        return x - Math.floor(x);
+    };
+
+    // Randomize ocean hue (blue to teal to purple)
+    const oceanHue = random(seed * 1.1);
+    const oceanR = Math.floor(15 + oceanHue * 40);
+    const oceanG = Math.floor(50 + oceanHue * 80);
+    const oceanB = Math.floor(90 + random(seed * 1.2) * 100);
+
+    // Randomize land hue (green to orange to red)
+    const landHue = random(seed * 2.3);
+    const landR = Math.floor(60 + landHue * 80);
+    const landG = Math.floor(100 + landHue * 60);
+    const landB = Math.floor(30 + landHue * 50);
+
+    // Randomize ice caps (white to pale blue/cyan)
+    const iceHue = random(seed * 3.7);
+    const iceR = Math.floor(230 + iceHue * 25);
+    const iceG = Math.floor(240 + iceHue * 15);
+    const iceB = Math.floor(245 + random(seed * 3.9) * 10);
+
+    return {
+        deepOcean: { r: oceanR, g: oceanG, b: oceanB },
+        ocean: { r: oceanR + 15, g: oceanG + 30, b: oceanB + 60 },
+        shallowOcean: { r: oceanR + 35, g: oceanG + 70, b: oceanB + 90 },
+        beach: { r: 194 + random(seed * 4.1) * 40, g: 178 + random(seed * 4.2) * 40, b: 128 + random(seed * 4.3) * 40 },
+        lowland: { r: landR, g: landG, b: landB },
+        highland: { r: landR + 20, g: landG + 20, b: landB + 10 },
+        mountain: { r: 120, g: 110, b: 100 },
+        snowCap: { r: iceR, g: iceG, b: iceB },
+    };
+}
 
 /**
  * Interpolate between two colors
@@ -139,39 +167,46 @@ function lerpColor(color1: TerrainColor, color2: TerrainColor, t: number): Terra
 }
 
 /**
- * Get terrain color based on height and latitude
+ * Get terrain color based on height, latitude, and noise for jagged ice caps
  */
-function getTerrainColor(height: number, latitude: number): TerrainColor {
-    // Ice caps at poles (latitude close to 1 or -1)
+function getTerrainColor(
+    height: number,
+    latitude: number,
+    terrainColors: ReturnType<typeof generateTerrainColors>,
+    jaggedNoise: number
+): TerrainColor {
+    // Ice caps at poles with jagged boundaries
     const polarDistance = Math.abs(latitude);
-    if (polarDistance > 0.8 && height > 0.3) {
-        return TERRAIN_COLORS.snowCap;
+    // Add noise to ice cap boundary for jagged effect
+    const iceCapThreshold = 0.75 + jaggedNoise * 0.15;
+    if (polarDistance > iceCapThreshold && height > 0.3) {
+        return terrainColors.snowCap;
     }
 
     // Height-based terrain
     if (height < 0.3) {
-        return TERRAIN_COLORS.deepOcean;
+        return terrainColors.deepOcean;
     } else if (height < 0.4) {
         const t = (height - 0.3) / 0.1;
-        return lerpColor(TERRAIN_COLORS.deepOcean, TERRAIN_COLORS.ocean, t);
+        return lerpColor(terrainColors.deepOcean, terrainColors.ocean, t);
     } else if (height < 0.45) {
         const t = (height - 0.4) / 0.05;
-        return lerpColor(TERRAIN_COLORS.ocean, TERRAIN_COLORS.shallowOcean, t);
+        return lerpColor(terrainColors.ocean, terrainColors.shallowOcean, t);
     } else if (height < 0.48) {
         const t = (height - 0.45) / 0.03;
-        return lerpColor(TERRAIN_COLORS.shallowOcean, TERRAIN_COLORS.beach, t);
+        return lerpColor(terrainColors.shallowOcean, terrainColors.beach, t);
     } else if (height < 0.6) {
         const t = (height - 0.48) / 0.12;
-        return lerpColor(TERRAIN_COLORS.beach, TERRAIN_COLORS.lowland, t);
+        return lerpColor(terrainColors.beach, terrainColors.lowland, t);
     } else if (height < 0.75) {
         const t = (height - 0.6) / 0.15;
-        return lerpColor(TERRAIN_COLORS.lowland, TERRAIN_COLORS.highland, t);
+        return lerpColor(terrainColors.lowland, terrainColors.highland, t);
     } else if (height < 0.85) {
         const t = (height - 0.75) / 0.1;
-        return lerpColor(TERRAIN_COLORS.highland, TERRAIN_COLORS.mountain, t);
+        return lerpColor(terrainColors.highland, terrainColors.mountain, t);
     } else {
         const t = (height - 0.85) / 0.15;
-        return lerpColor(TERRAIN_COLORS.mountain, TERRAIN_COLORS.snowCap, t);
+        return lerpColor(terrainColors.mountain, terrainColors.snowCap, t);
     }
 }
 
@@ -190,6 +225,9 @@ export function generatePlanetTexture(
     // Use planet ID or random seed
     const planetSeed = seed !== undefined ? seed : Math.random();
     const noise = new PerlinNoise(planetSeed);
+
+    // Generate randomized terrain colors for this planet
+    const terrainColors = generateTerrainColors(planetSeed);
 
     const imageData = ctx.createImageData(size, size);
     const data = imageData.data;
@@ -226,8 +264,11 @@ export function generatePlanetTexture(
             // Calculate latitude for ice caps (-1 to 1)
             const latitude = Math.sin(lat);
 
+            // Generate jagged noise for ice cap boundaries
+            const jaggedNoise = octaveNoise(noise, lon * 8, lat * 8, 3, 0.5);
+
             // Get terrain color
-            const color = getTerrainColor(normalizedHeight, latitude);
+            const color = getTerrainColor(normalizedHeight, latitude, terrainColors, jaggedNoise);
 
             // Add slight variation for texture
             const variation = octaveNoise(noise, sx * 20, sy * 20, 2, 0.3) * 10;

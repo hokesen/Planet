@@ -3,7 +3,8 @@ import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
 import { Head, router, useForm } from '@inertiajs/react';
-import { useState } from 'react';
+import { Maximize2, Minimize2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -48,6 +49,7 @@ export default function Dashboard({ galaxies }: { galaxies: Galaxy[] }) {
     const [showPlanetForm, setShowPlanetForm] = useState<number | null>(null);
     const [showMissionForm, setShowMissionForm] = useState<number | null>(null);
     const [editingMission, setEditingMission] = useState<Mission | null>(null);
+    const [isFullscreen, setIsFullscreen] = useState(false);
 
     const galaxyForm = useForm({
         name: '',
@@ -70,6 +72,33 @@ export default function Dashboard({ galaxies }: { galaxies: Galaxy[] }) {
         priority: 'medium' as const,
         deadline: '',
     });
+
+    // Fullscreen functionality
+    useEffect(() => {
+        const handleFullscreenChange = () => {
+            setIsFullscreen(!!document.fullscreenElement);
+        };
+
+        document.addEventListener('fullscreenchange', handleFullscreenChange);
+        return () => {
+            document.removeEventListener(
+                'fullscreenchange',
+                handleFullscreenChange,
+            );
+        };
+    }, []);
+
+    const toggleFullscreen = async () => {
+        try {
+            if (!document.fullscreenElement) {
+                await document.documentElement.requestFullscreen();
+            } else {
+                await document.exitFullscreen();
+            }
+        } catch (error) {
+            console.error('Error toggling fullscreen:', error);
+        }
+    };
 
     const handleCreateGalaxy = (e: React.FormEvent) => {
         e.preventDefault();
@@ -160,9 +189,29 @@ export default function Dashboard({ galaxies }: { galaxies: Galaxy[] }) {
                             Manage your galaxies and planets
                         </p>
                     </div>
-                    <Button onClick={() => setShowGalaxyForm(!showGalaxyForm)}>
-                        {showGalaxyForm ? 'Cancel' : '+ Create Galaxy'}
-                    </Button>
+                    <div className="flex items-center gap-2">
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={toggleFullscreen}
+                            title={
+                                isFullscreen
+                                    ? 'Exit fullscreen'
+                                    : 'Enter fullscreen'
+                            }
+                        >
+                            {isFullscreen ? (
+                                <Minimize2 className="h-4 w-4" />
+                            ) : (
+                                <Maximize2 className="h-4 w-4" />
+                            )}
+                        </Button>
+                        <Button
+                            onClick={() => setShowGalaxyForm(!showGalaxyForm)}
+                        >
+                            {showGalaxyForm ? 'Cancel' : '+ Create Galaxy'}
+                        </Button>
+                    </div>
                 </div>
 
                 {showGalaxyForm && (

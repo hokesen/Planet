@@ -24,7 +24,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import type { Galaxy3D, Mission3D } from '@/types/space';
 import { router, useForm } from '@inertiajs/react';
-import { MoveDown, MoveUp, Rocket, Trash2, X, Fuel } from 'lucide-react';
+import { Fuel, MoveDown, MoveUp, Rocket, Trash2, X } from 'lucide-react';
 import { useEffect } from 'react';
 import InputError from './input-error';
 
@@ -115,12 +115,9 @@ export default function MissionModal({
     const handleDeleteRefuel = (refuelId: number) => {
         if (!mission) return;
         if (confirm('Are you sure you want to delete this refuel entry?')) {
-            router.delete(
-                `/missions/${mission.id}/refuels/${refuelId}`,
-                {
-                    preserveScroll: true,
-                }
-            );
+            router.delete(`/missions/${mission.id}/refuels/${refuelId}`, {
+                preserveScroll: true,
+            });
         }
     };
 
@@ -520,46 +517,61 @@ export default function MissionModal({
                             </div>
                         </div>
 
-                        {isEditing && mission && mission.commitment_type !== 'one_time' && (
-                            <div className="space-y-2">
-                                <Label className="flex items-center gap-2">
-                                    <Fuel className="h-4 w-4" />
-                                    Refuel History
-                                </Label>
-                                <div className="rounded-lg border border-border bg-muted/50 p-3">
-                                    {mission.refuels && mission.refuels.length > 0 ? (
-                                        <div className="space-y-2">
-                                            {mission.refuels.map((refuel) => (
-                                                <div
-                                                    key={refuel.id}
-                                                    className="flex items-center justify-between rounded-md border border-border bg-background p-2"
-                                                >
-                                                    <span className="text-sm">
-                                                        {formatRefuelDate(refuel.refueled_at)}
-                                                    </span>
-                                                    <Button
-                                                        type="button"
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() => handleDeleteRefuel(refuel.id)}
-                                                        className="h-7 w-7 p-0 text-destructive hover:text-destructive"
-                                                    >
-                                                        <Trash2 className="h-3 w-3" />
-                                                    </Button>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    ) : (
-                                        <p className="text-sm text-muted-foreground">
-                                            No refuel history yet. Click "Refuel" after completing the task.
-                                        </p>
-                                    )}
+                        {isEditing &&
+                            mission &&
+                            mission.commitment_type !== 'one_time' && (
+                                <div className="space-y-2">
+                                    <Label className="flex items-center gap-2">
+                                        <Fuel className="h-4 w-4" />
+                                        Refuel History
+                                    </Label>
+                                    <div className="rounded-lg border border-border bg-muted/50 p-3">
+                                        {mission.refuels &&
+                                        mission.refuels.length > 0 ? (
+                                            <div className="space-y-2">
+                                                {mission.refuels.map(
+                                                    (refuel) => (
+                                                        <div
+                                                            key={refuel.id}
+                                                            className="flex items-center justify-between rounded-md border border-border bg-background p-2"
+                                                        >
+                                                            <span className="text-sm">
+                                                                {formatRefuelDate(
+                                                                    refuel.refueled_at,
+                                                                )}
+                                                            </span>
+                                                            <Button
+                                                                type="button"
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                onClick={() =>
+                                                                    handleDeleteRefuel(
+                                                                        refuel.id,
+                                                                    )
+                                                                }
+                                                                className="h-7 w-7 p-0 text-destructive hover:text-destructive"
+                                                            >
+                                                                <Trash2 className="h-3 w-3" />
+                                                            </Button>
+                                                        </div>
+                                                    ),
+                                                )}
+                                            </div>
+                                        ) : (
+                                            <p className="text-sm text-muted-foreground">
+                                                No refuel history yet. Click
+                                                "Refuel" after completing the
+                                                task.
+                                            </p>
+                                        )}
+                                    </div>
+                                    <p className="text-xs text-muted-foreground">
+                                        Track when you've completed this{' '}
+                                        {mission.commitment_type} task in real
+                                        life.
+                                    </p>
                                 </div>
-                                <p className="text-xs text-muted-foreground">
-                                    Track when you've completed this {mission.commitment_type} task in real life.
-                                </p>
-                            </div>
-                        )}
+                            )}
 
                         <div className="space-y-2">
                             <Label htmlFor="deadline">Deadline</Label>

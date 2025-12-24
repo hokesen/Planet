@@ -1,6 +1,5 @@
 import GalaxyModal from '@/components/galaxy-modal';
 import MissionModal from '@/components/mission-modal';
-import { router } from '@inertiajs/react';
 import PlanetModal from '@/components/planet-modal';
 import { SpaceVisualization } from '@/components/space-visualization';
 import { Button } from '@/components/ui/button';
@@ -9,9 +8,16 @@ import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import type { BreadcrumbItem } from '@/types';
 import type { Galaxy3D, Mission3D, Planet3D } from '@/types/space';
-import { Head } from '@inertiajs/react';
-import { Globe, Plus, Rocket, Sparkles } from 'lucide-react';
-import { useState } from 'react';
+import { Head, router } from '@inertiajs/react';
+import {
+    Globe,
+    Maximize2,
+    Minimize2,
+    Plus,
+    Rocket,
+    Sparkles,
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -58,6 +64,34 @@ export default function Dashboard3D({ galaxies, capacity }: Dashboard3DProps) {
     const [showGalaxyModal, setShowGalaxyModal] = useState(false);
     const [showWormholeModal, setShowWormholeModal] = useState(false);
     const [showFabMenu, setShowFabMenu] = useState(false);
+    const [isFullscreen, setIsFullscreen] = useState(false);
+
+    // Fullscreen functionality
+    useEffect(() => {
+        const handleFullscreenChange = () => {
+            setIsFullscreen(!!document.fullscreenElement);
+        };
+
+        document.addEventListener('fullscreenchange', handleFullscreenChange);
+        return () => {
+            document.removeEventListener(
+                'fullscreenchange',
+                handleFullscreenChange,
+            );
+        };
+    }, []);
+
+    const toggleFullscreen = async () => {
+        try {
+            if (!document.fullscreenElement) {
+                await document.documentElement.requestFullscreen();
+            } else {
+                await document.exitFullscreen();
+            }
+        } catch (error) {
+            console.error('Error toggling fullscreen:', error);
+        }
+    };
 
     const handleRocketClick = (mission: Mission3D) => {
         setSelectedMission(mission);
@@ -80,9 +114,13 @@ export default function Dashboard3D({ galaxies, capacity }: Dashboard3DProps) {
 
     const handleRefuel = (missionId: number, e: React.MouseEvent) => {
         e.stopPropagation();
-        router.post(`/missions/${missionId}/refuel`, {}, {
-            preserveScroll: true,
-        });
+        router.post(
+            `/missions/${missionId}/refuel`,
+            {},
+            {
+                preserveScroll: true,
+            },
+        );
     };
 
     const formatFuelRemaining = (seconds: number | null): string => {
@@ -146,6 +184,27 @@ export default function Dashboard3D({ galaxies, capacity }: Dashboard3DProps) {
                     onWormholeClick={handleWormholeClick}
                 />
 
+                {/* Fullscreen button - top right */}
+                <div className="absolute top-4 right-4">
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={toggleFullscreen}
+                        className="bg-black/70 text-white backdrop-blur-lg hover:bg-black/80"
+                        title={
+                            isFullscreen
+                                ? 'Exit fullscreen'
+                                : 'Enter fullscreen'
+                        }
+                    >
+                        {isFullscreen ? (
+                            <Minimize2 className="h-4 w-4" />
+                        ) : (
+                            <Maximize2 className="h-4 w-4" />
+                        )}
+                    </Button>
+                </div>
+
                 {/* Mission Control - Active Rockets Panel - top left */}
                 <div className="absolute top-4 left-4 max-h-[80vh] w-80 overflow-y-auto rounded-lg bg-black/70 p-4 text-white backdrop-blur-lg">
                     <h2 className="mb-3 text-lg font-bold">Mission Control</h2>
@@ -196,8 +255,11 @@ export default function Dashboard3D({ galaxies, capacity }: Dashboard3DProps) {
                                     ({ mission, planet, galaxy }) => {
                                         // Get fuel status from backend
                                         const fuelStatus = mission.fuel_status;
-                                        const fuelRemainingSeconds = fuelStatus?.fuel_remaining_seconds ?? null;
-                                        const needsRefuel = fuelStatus?.needs_refuel ?? false;
+                                        const fuelRemainingSeconds =
+                                            fuelStatus?.fuel_remaining_seconds ??
+                                            null;
+                                        const needsRefuel =
+                                            fuelStatus?.needs_refuel ?? false;
                                         const priorityColors: Record<
                                             string,
                                             string
@@ -344,17 +406,30 @@ export default function Dashboard3D({ galaxies, capacity }: Dashboard3DProps) {
                                                                 }
                                                             </span>
                                                             <span>•</span>
-                                                            <span className={needsRefuel ? 'text-red-400 font-semibold' : ''}>
+                                                            <span
+                                                                className={
+                                                                    needsRefuel
+                                                                        ? 'font-semibold text-red-400'
+                                                                        : ''
+                                                                }
+                                                            >
                                                                 Fuel:{' '}
-                                                                {formatFuelRemaining(fuelRemainingSeconds)}
+                                                                {formatFuelRemaining(
+                                                                    fuelRemainingSeconds,
+                                                                )}
                                                             </span>
                                                         </div>
                                                     </div>
                                                     <button
-                                                        onClick={(e) => handleRefuel(mission.id, e)}
+                                                        onClick={(e) =>
+                                                            handleRefuel(
+                                                                mission.id,
+                                                                e,
+                                                            )
+                                                        }
                                                         className={`rounded px-2 py-1 text-[10px] font-semibold transition-colors ${
                                                             needsRefuel
-                                                                ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30 animate-pulse'
+                                                                ? 'animate-pulse bg-red-500/20 text-red-400 hover:bg-red-500/30'
                                                                 : 'bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30'
                                                         }`}
                                                     >

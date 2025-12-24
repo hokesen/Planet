@@ -4,31 +4,19 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="260f6228-9afc-4530-8118-cc221fcfaacc" name="Changes" comment="Ice caps &amp; textures">
+    <list default="true" id="260f6228-9afc-4530-8118-cc221fcfaacc" name="Changes" comment="Refuel missions">
+      <change afterPath="$PROJECT_DIR$/app/Models/MissionRefuel.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/database/factories/MissionRefuelFactory.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/database/migrations/2025_12_24_004557_add_planet_route_to_missions_table.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/database/migrations/2025_12_24_011545_create_mission_refuels_table.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/Feature/Feature/MissionRefuelTest.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/MissionController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/MissionController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Requests/Mission/StoreMissionRequest.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Requests/Mission/StoreMissionRequest.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Requests/Mission/UpdateMissionRequest.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Requests/Mission/UpdateMissionRequest.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Models/Mission.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Mission.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/app-logo.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/app-logo.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/capacity-indicator.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/capacity-indicator.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/galaxy-modal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/galaxy-modal.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/factories/GalaxyFactory.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/factories/GalaxyFactory.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/factories/MissionFactory.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/factories/MissionFactory.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/factories/PlanetFactory.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/factories/PlanetFactory.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/components/mission-modal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/mission-modal.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/nav-main.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/nav-main.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/planet-modal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/planet-modal.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/space-visualization.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/space-visualization.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/components/wormhole-modal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/wormhole-modal.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/lib/space/black-hole-manager.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/lib/space/black-hole-manager.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/lib/space/galaxy-boundaries.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/lib/space/galaxy-boundaries.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/lib/space/interaction-handler.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/lib/space/interaction-handler.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/lib/space/planet-manager.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/lib/space/planet-manager.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/lib/space/procedural-textures.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/lib/space/procedural-textures.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/lib/space/rocket-manager.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/lib/space/rocket-manager.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/lib/space/scene-setup.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/lib/space/scene-setup.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/pages/dashboard-3d.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/dashboard-3d.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/pages/dashboard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/dashboard.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/types/space.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/types/space.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/web.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/web.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -139,7 +127,7 @@
       <updated>1766441299164</updated>
       <workItem from="1766441300875" duration="42000" />
       <workItem from="1766441376533" duration="96000" />
-      <workItem from="1766441537817" duration="14826000" />
+      <workItem from="1766441537817" duration="16167000" />
     </task>
     <task id="LOCAL-00001" summary="Install Laravel React Template">
       <option name="closed" value="true" />
@@ -197,7 +185,15 @@
       <option name="project" value="LOCAL" />
       <updated>1766536817154</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="Refuel missions">
+      <option name="closed" value="true" />
+      <created>1766553957444</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1766553957444</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -211,7 +207,8 @@
     <MESSAGE value="planet simulation" />
     <MESSAGE value="Black holes &amp; wormhole" />
     <MESSAGE value="Ice caps &amp; textures" />
-    <option name="LAST_COMMIT_MESSAGE" value="Ice caps &amp; textures" />
+    <MESSAGE value="Refuel missions" />
+    <option name="LAST_COMMIT_MESSAGE" value="Refuel missions" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

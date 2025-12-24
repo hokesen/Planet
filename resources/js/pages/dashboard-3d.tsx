@@ -17,7 +17,7 @@ import {
     Rocket,
     Sparkles,
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -67,30 +67,8 @@ export default function Dashboard3D({ galaxies, capacity }: Dashboard3DProps) {
     const [isFullscreen, setIsFullscreen] = useState(false);
 
     // Fullscreen functionality
-    useEffect(() => {
-        const handleFullscreenChange = () => {
-            setIsFullscreen(!!document.fullscreenElement);
-        };
-
-        document.addEventListener('fullscreenchange', handleFullscreenChange);
-        return () => {
-            document.removeEventListener(
-                'fullscreenchange',
-                handleFullscreenChange,
-            );
-        };
-    }, []);
-
-    const toggleFullscreen = async () => {
-        try {
-            if (!document.fullscreenElement) {
-                await document.documentElement.requestFullscreen();
-            } else {
-                await document.exitFullscreen();
-            }
-        } catch (error) {
-            console.error('Error toggling fullscreen:', error);
-        }
+    const toggleFullscreen = () => {
+        setIsFullscreen(!isFullscreen);
     };
 
     const handleRocketClick = (mission: Mission3D) => {
@@ -170,11 +148,13 @@ export default function Dashboard3D({ galaxies, capacity }: Dashboard3DProps) {
         setShowFabMenu(false);
     };
 
-    return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+    const content = (
+        <>
             <Head title="Mission Control" />
 
-            <div className="relative h-full w-full overflow-hidden">
+            <div
+                className={`relative w-full overflow-hidden ${isFullscreen ? 'fixed inset-0 z-50 h-screen bg-black' : 'h-full'}`}
+            >
                 {/* Full-screen 3D canvas */}
                 <SpaceVisualization
                     galaxies={galaxies}
@@ -185,16 +165,16 @@ export default function Dashboard3D({ galaxies, capacity }: Dashboard3DProps) {
                 />
 
                 {/* Fullscreen button - top right */}
-                <div className="absolute top-4 right-4">
+                <div className="absolute top-4 right-4 z-10">
                     <Button
                         variant="outline"
                         size="icon"
                         onClick={toggleFullscreen}
-                        className="bg-black/70 text-white backdrop-blur-lg hover:bg-black/80"
+                        className="bg-black/70 text-white backdrop-blur-lg hover:bg-black/80 hover:text-white"
                         title={
                             isFullscreen
-                                ? 'Exit fullscreen'
-                                : 'Enter fullscreen'
+                                ? 'Exit fullscreen mode'
+                                : 'Maximize simulation'
                         }
                     >
                         {isFullscreen ? (
@@ -533,6 +513,13 @@ export default function Dashboard3D({ galaxies, capacity }: Dashboard3DProps) {
                     capacity={capacity}
                 />
             </div>
-        </AppLayout>
+        </>
+    );
+
+    // Render with or without layout based on fullscreen state
+    return isFullscreen ? (
+        content
+    ) : (
+        <AppLayout breadcrumbs={breadcrumbs}>{content}</AppLayout>
     );
 }

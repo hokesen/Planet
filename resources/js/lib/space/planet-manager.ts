@@ -353,6 +353,8 @@ export function addPlanetEffects(mesh: THREE.Mesh, planet: Planet3D): void {
 export class PlanetManager {
     private planets: Map<number, PlanetInstance> = new Map();
     private galaxyCenters: Map<number, THREE.Vector3> = new Map();
+    private galaxyRotationAngles: Map<number, number> = new Map();
+    private galaxyRotationSpeed = 0.02; // radians per second
 
     constructor(
         private scene: THREE.Scene,
@@ -366,10 +368,14 @@ export class PlanetManager {
         // Auto-position planets that need it
         autoPositionPlanets(this.galaxies);
 
-        // Calculate and store galaxy centers
-        this.galaxies.forEach((galaxy) => {
+        // Calculate and store galaxy centers and initial rotation angles
+        this.galaxies.forEach((galaxy, gIndex) => {
             const center = calculateGalaxyCenter(galaxy);
             this.galaxyCenters.set(galaxy.id, center);
+
+            // Initialize rotation angle based on galaxy's initial position
+            const initialAngle = (gIndex / this.galaxies.length) * Math.PI * 2;
+            this.galaxyRotationAngles.set(galaxy.id, initialAngle);
         });
 
         // Create planet meshes
@@ -449,9 +455,36 @@ export class PlanetManager {
     }
 
     /**
+     * Get all galaxy centers
+     */
+    getGalaxyCenters(): Map<number, THREE.Vector3> {
+        return this.galaxyCenters;
+    }
+
+    /**
      * Update planet animations (rotation, orbital movement, effects)
      */
     update(deltaTime: number): void {
+        // Update galaxy rotation angles
+        this.galaxyRotationAngles.forEach((angle, galaxyId) => {
+            const newAngle = angle + this.galaxyRotationSpeed * deltaTime;
+            this.galaxyRotationAngles.set(galaxyId, newAngle);
+        });
+
+        // Recalculate galaxy centers based on new rotation angles
+        this.galaxies.forEach((galaxy, gIndex) => {
+            const angle = this.galaxyRotationAngles.get(galaxy.id) || 0;
+            const radius = this.galaxies.length > 1 ? 80 : 0;
+            const centerX = Math.cos(angle) * radius;
+            const centerZ = Math.sin(angle) * radius;
+            const centerY = ((gIndex % 3) - 1) * 20;
+
+            this.galaxyCenters.set(
+                galaxy.id,
+                new THREE.Vector3(centerX, centerY, centerZ),
+            );
+        });
+
         this.planets.forEach((instance) => {
             // Get galaxy center for this planet
             const galaxyCenter = this.galaxyCenters.get(

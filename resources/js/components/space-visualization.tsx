@@ -2,6 +2,7 @@ import { BlackHoleManager } from '@/lib/space/black-hole-manager';
 import {
     createAllGalaxyBoundaries,
     removeGalaxyBoundaries,
+    updateGalaxyBoundaries,
 } from '@/lib/space/galaxy-boundaries';
 import { InteractionHandler } from '@/lib/space/interaction-handler';
 import { PlanetManager } from '@/lib/space/planet-manager';
@@ -152,11 +153,26 @@ export function SpaceVisualization({
             // Automatic camera rotation (disabled - manual control takes precedence)
             // User can now drag to rotate the camera manually
 
+            // Update planets (rotation, orbital movement, galaxy rotation)
+            sceneDataRef.current.planetManager.update(deltaTime);
+
+            // Get updated galaxy centers
+            const galaxyCenters =
+                sceneDataRef.current.planetManager.getGalaxyCenters();
+
+            // Update black hole positions to follow rotating galaxies
+            sceneDataRef.current.blackHoleManager.updateGalaxyPositions(
+                galaxyCenters,
+            );
+
+            // Update galaxy boundary positions
+            updateGalaxyBoundaries(
+                sceneDataRef.current.galaxyBoundaries,
+                galaxyCenters,
+            );
+
             // Update black holes (rotation, pulsing glow)
             sceneDataRef.current.blackHoleManager.update(deltaTime);
-
-            // Update planets (rotation, orbital movement, effects)
-            sceneDataRef.current.planetManager.update(deltaTime);
 
             // Update rockets (linear travel, path lines)
             sceneDataRef.current.rocketManager.update(deltaTime);

@@ -4,8 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="260f6228-9afc-4530-8118-cc221fcfaacc" name="Changes" comment="Fullscreen button">
-      <change beforePath="$PROJECT_DIR$/resources/js/pages/dashboard-3d.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/dashboard-3d.tsx" afterDir="false" />
+    <list default="true" id="260f6228-9afc-4530-8118-cc221fcfaacc" name="Changes" comment="Maximize fullscreen">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/lib/space/planet-manager.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/lib/space/planet-manager.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/pages/dashboard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/dashboard.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -116,7 +118,7 @@
       <updated>1766441299164</updated>
       <workItem from="1766441300875" duration="42000" />
       <workItem from="1766441376533" duration="96000" />
-      <workItem from="1766441537817" duration="16740000" />
+      <workItem from="1766441537817" duration="18342000" />
     </task>
     <task id="LOCAL-00001" summary="Install Laravel React Template">
       <option name="closed" value="true" />
@@ -190,7 +192,15 @@
       <option name="project" value="LOCAL" />
       <updated>1766559070759</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="Maximize fullscreen">
+      <option name="closed" value="true" />
+      <created>1766559631545</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1766559631545</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -206,7 +216,8 @@
     <MESSAGE value="Ice caps &amp; textures" />
     <MESSAGE value="Refuel missions" />
     <MESSAGE value="Fullscreen button" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fullscreen button" />
+    <MESSAGE value="Maximize fullscreen" />
+    <option name="LAST_COMMIT_MESSAGE" value="Maximize fullscreen" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

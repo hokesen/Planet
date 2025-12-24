@@ -116,6 +116,22 @@ export function createAllGalaxyBoundaries(
 }
 
 /**
+ * Update galaxy boundary positions based on new galaxy centers
+ */
+export function updateGalaxyBoundaries(
+    boundaries: THREE.LineSegments[],
+    galaxyCenters: Map<number, THREE.Vector3>,
+): void {
+    boundaries.forEach((boundary) => {
+        const galaxy = boundary.userData.galaxy as Galaxy3D;
+        const newCenter = galaxyCenters.get(galaxy.id);
+        if (newCenter) {
+            boundary.position.copy(newCenter);
+        }
+    });
+}
+
+/**
  * Remove all galaxy boundaries from the scene
  */
 export function removeGalaxyBoundaries(

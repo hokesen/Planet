@@ -158,6 +158,21 @@ export class BlackHoleManager {
     }
 
     /**
+     * Update galaxy center positions (for rotating galaxies)
+     */
+    updateGalaxyPositions(galaxyCenters: Map<number, THREE.Vector3>): void {
+        this.galaxyCenters = galaxyCenters;
+
+        // Update black hole positions to follow galaxy centers
+        this.blackHoles.forEach((blackHole, galaxyId) => {
+            const newCenter = galaxyCenters.get(galaxyId);
+            if (newCenter) {
+                blackHole.position.copy(newCenter);
+            }
+        });
+    }
+
+    /**
      * Update black hole animations (rotating accretion disk)
      */
     update(deltaTime: number): void {

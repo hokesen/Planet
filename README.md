@@ -2,6 +2,9 @@
 
 Space-themed project management system with 3D visualization, recurring tasks, and capacity planning.
 
+<img width="1647" height="899" alt="image" src="https://github.com/user-attachments/assets/b383a629-946a-45db-a411-c2b42bf439bf" />
+
+
 ## What It Does
 
 **Core Concept:**

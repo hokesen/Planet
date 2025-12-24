@@ -48,7 +48,7 @@ export default function CapacityIndicator({
     };
 
     return (
-        <div className="absolute right-4 top-4 rounded-lg bg-black/70 p-4 text-white backdrop-blur-lg">
+        <div className="absolute top-4 right-4 rounded-lg bg-black/70 p-4 text-white backdrop-blur-lg">
             <h3 className="mb-3 flex items-center gap-2 text-sm font-bold">
                 <Rocket className="h-4 w-4" />
                 Capacity Tracker
@@ -64,7 +64,9 @@ export default function CapacityIndicator({
                         </span>
                         <span className="font-mono">
                             {formatMinutes(capacity.commitment.daily)} /{' '}
-                            {formatMinutes(capacity.settings.daily_capacity_minutes)}
+                            {formatMinutes(
+                                capacity.settings.daily_capacity_minutes,
+                            )}
                         </span>
                     </div>
                     <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-700">
@@ -92,7 +94,9 @@ export default function CapacityIndicator({
                         </span>
                         <span className="font-mono">
                             {formatMinutes(capacity.commitment.weekly)} /{' '}
-                            {formatMinutes(capacity.settings.weekly_capacity_minutes)}
+                            {formatMinutes(
+                                capacity.settings.weekly_capacity_minutes,
+                            )}
                         </span>
                     </div>
                     <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-700">
@@ -121,7 +125,7 @@ export default function CapacityIndicator({
                         <span className="font-mono">
                             {formatMinutes(capacity.commitment.monthly)} /{' '}
                             {formatMinutes(
-                                capacity.settings.monthly_capacity_minutes
+                                capacity.settings.monthly_capacity_minutes,
                             )}
                         </span>
                     </div>
@@ -155,7 +159,8 @@ export default function CapacityIndicator({
                         capacity.percentages.weekly_percentage >= 100 ||
                         capacity.percentages.monthly_percentage >= 100) && (
                         <div className="rounded border border-red-500/50 bg-red-500/10 p-2 text-[10px]">
-                            ⚠️ Over capacity! Consider adjusting your commitments.
+                            ⚠️ Over capacity! Consider adjusting your
+                            commitments.
                         </div>
                     )}
             </div>

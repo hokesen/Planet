@@ -1,5 +1,5 @@
-import * as THREE from 'three';
 import type { Mission3D, Planet3D, RocketInstance } from '@/types/space';
+import * as THREE from 'three';
 
 /**
  * Get rocket speed based on commitment type
@@ -190,12 +190,9 @@ function createTrail(color: number): THREE.Points {
  * Create a dotted path line showing rocket's full travel path
  */
 function createRocketPathLine(
-    homePos: THREE.Vector3,
-    planetPos: THREE.Vector3,
-    color: number
+    points: THREE.Vector3[],
+    color: number,
 ): THREE.Line {
-    const points: THREE.Vector3[] = [homePos, planetPos];
-
     const geometry = new THREE.BufferGeometry().setFromPoints(points);
     const material = new THREE.LineDashedMaterial({
         color: color,
@@ -224,7 +221,7 @@ export class RocketManager {
      */
     initialize(
         missions: Mission3D[],
-        getPlanetById: (id: number) => Planet3D | undefined
+        getPlanetById: (id: number) => Planet3D | undefined,
     ): void {
         missions.forEach((mission) => {
             // Only create rockets for non-completed, recurring missions
@@ -240,6 +237,23 @@ export class RocketManager {
             const planet = getPlanetById(mission.planet_id);
             if (!planet) return;
 
+            // Build route - if planet_route exists, use it; otherwise use single planet
+            const route: Planet3D[] = [];
+            if (mission.planet_route && mission.planet_route.length > 0) {
+                // Multi-planet route
+                for (const planetId of mission.planet_route) {
+                    const routePlanet = getPlanetById(planetId);
+                    if (routePlanet) {
+                        route.push(routePlanet);
+                    }
+                }
+            } else {
+                // Single planet (backward compatibility)
+                route.push(planet);
+            }
+
+            if (route.length === 0) return;
+
             const mesh = createRocket(mission);
             const orbitRadius = planet.orbit_radius || 20;
             const speed = getRocketSpeed(mission.commitment_type || 'one_time');
@@ -247,13 +261,13 @@ export class RocketManager {
             // Start at home base (0, 0, 0)
             mesh.position.set(0, 0, 0);
 
-            // Point rocket towards planet
-            const planetPos = new THREE.Vector3(
-                planet.position_x || 0,
-                planet.position_y || 0,
-                planet.position_z || 0
+            // Point rocket towards first planet in route
+            const firstPlanetPos = new THREE.Vector3(
+                route[0].position_x || 0,
+                route[0].position_y || 0,
+                route[0].position_z || 0,
             );
-            mesh.lookAt(planetPos);
+            mesh.lookAt(firstPlanetPos);
 
             this.scene.add(mesh);
 
@@ -261,12 +275,23 @@ export class RocketManager {
             const trail = createTrail(getPriorityColor(mission.priority));
             this.scene.add(trail);
 
-            // Create dotted path line
+            // Create dotted path line showing full route
             const homePos = new THREE.Vector3(0, 0, 0);
+            const pathPoints: THREE.Vector3[] = [homePos];
+            for (const routePlanet of route) {
+                pathPoints.push(
+                    new THREE.Vector3(
+                        routePlanet.position_x || 0,
+                        routePlanet.position_y || 0,
+                        routePlanet.position_z || 0,
+                    ),
+                );
+            }
+            pathPoints.push(homePos); // Return to home
+
             const pathLine = createRocketPathLine(
-                homePos,
-                planetPos,
-                getPriorityColor(mission.priority)
+                pathPoints,
+                getPriorityColor(mission.priority),
             );
             this.scene.add(pathLine);
 
@@ -274,6 +299,8 @@ export class RocketManager {
                 mesh,
                 mission,
                 planet,
+                route: route.length > 1 ? route : undefined, // Only set if multi-planet
+                currentSegment: 0,
                 angle: 0, // Kept for compatibility
                 orbitRadius,
                 speed,
@@ -289,57 +316,132 @@ export class RocketManager {
     }
 
     /**
-     * Update all rockets (linear travel between home and planet)
+     * Update all rockets (linear travel between waypoints)
      */
     update(deltaTime: number): void {
         this.rockets.forEach((rocket) => {
-            // Home base position (origin)
             const homePos = new THREE.Vector3(0, 0, 0);
 
-            // Planet position (updated by planet manager as planets orbit)
-            const planetPos = new THREE.Vector3(
-                rocket.planet.position_x || 0,
-                rocket.planet.position_y || 0,
-                rocket.planet.position_z || 0
-            );
+            // Determine current segment's start and end positions
+            let startPos: THREE.Vector3;
+            let endPos: THREE.Vector3;
 
-            // Update path line to follow moving planet
-            if (rocket.pathLine) {
-                const positions = rocket.pathLine.geometry.getAttribute('position');
-                positions.setXYZ(0, homePos.x, homePos.y, homePos.z);
-                positions.setXYZ(1, planetPos.x, planetPos.y, planetPos.z);
-                positions.needsUpdate = true;
-                rocket.pathLine.computeLineDistances(); // Recompute for dashed effect
+            if (rocket.route && rocket.route.length > 1) {
+                // Multi-planet route
+                const totalSegments = rocket.route.length + 1; // +1 for return to home
+                const segment = rocket.currentSegment ?? 0;
+
+                if (segment === 0) {
+                    // First segment: Home → First Planet
+                    startPos = homePos;
+                    endPos = new THREE.Vector3(
+                        rocket.route[0].position_x || 0,
+                        rocket.route[0].position_y || 0,
+                        rocket.route[0].position_z || 0,
+                    );
+                } else if (segment < rocket.route.length) {
+                    // Middle segments: Planet N → Planet N+1
+                    const prevPlanet = rocket.route[segment - 1];
+                    const nextPlanet = rocket.route[segment];
+                    startPos = new THREE.Vector3(
+                        prevPlanet.position_x || 0,
+                        prevPlanet.position_y || 0,
+                        prevPlanet.position_z || 0,
+                    );
+                    endPos = new THREE.Vector3(
+                        nextPlanet.position_x || 0,
+                        nextPlanet.position_y || 0,
+                        nextPlanet.position_z || 0,
+                    );
+                } else {
+                    // Last segment: Last Planet → Home
+                    const lastPlanet = rocket.route[rocket.route.length - 1];
+                    startPos = new THREE.Vector3(
+                        lastPlanet.position_x || 0,
+                        lastPlanet.position_y || 0,
+                        lastPlanet.position_z || 0,
+                    );
+                    endPos = homePos;
+                }
+
+                // Update path line to follow moving planets
+                if (rocket.pathLine) {
+                    const positions =
+                        rocket.pathLine.geometry.getAttribute('position');
+                    positions.setXYZ(0, homePos.x, homePos.y, homePos.z);
+                    for (let i = 0; i < rocket.route.length; i++) {
+                        const planet = rocket.route[i];
+                        positions.setXYZ(
+                            i + 1,
+                            planet.position_x || 0,
+                            planet.position_y || 0,
+                            planet.position_z || 0,
+                        );
+                    }
+                    positions.setXYZ(
+                        rocket.route.length + 1,
+                        homePos.x,
+                        homePos.y,
+                        homePos.z,
+                    );
+                    positions.needsUpdate = true;
+                    rocket.pathLine.computeLineDistances();
+                }
+            } else {
+                // Single planet (backward compatibility)
+                startPos = homePos;
+                endPos = new THREE.Vector3(
+                    rocket.planet.position_x || 0,
+                    rocket.planet.position_y || 0,
+                    rocket.planet.position_z || 0,
+                );
+
+                // Update path line to follow moving planet
+                if (rocket.pathLine) {
+                    const positions =
+                        rocket.pathLine.geometry.getAttribute('position');
+                    positions.setXYZ(0, homePos.x, homePos.y, homePos.z);
+                    positions.setXYZ(1, endPos.x, endPos.y, endPos.z);
+                    positions.setXYZ(2, homePos.x, homePos.y, homePos.z);
+                    positions.needsUpdate = true;
+                    rocket.pathLine.computeLineDistances();
+                }
             }
 
             // Update travel progress
-            // Speed is normalized to complete travel in similar time as old orbit
             const normalizedSpeed = rocket.speed * 0.05;
-            rocket.travelProgress += normalizedSpeed * deltaTime * rocket.direction;
+            rocket.travelProgress += normalizedSpeed * deltaTime;
 
-            // Reverse direction at endpoints
+            // Check if segment is complete
             if (rocket.travelProgress >= 1) {
-                rocket.travelProgress = 1;
-                rocket.direction = -1;
-            } else if (rocket.travelProgress <= 0) {
                 rocket.travelProgress = 0;
-                rocket.direction = 1;
+
+                if (rocket.route && rocket.route.length > 1) {
+                    // Move to next segment
+                    const totalSegments = rocket.route.length + 1;
+                    rocket.currentSegment =
+                        ((rocket.currentSegment ?? 0) + 1) % totalSegments;
+                }
             }
 
-            // Linear interpolation between home and planet
-            rocket.mesh.position.lerpVectors(homePos, planetPos, rocket.travelProgress);
+            // Linear interpolation between start and end of current segment
+            rocket.mesh.position.lerpVectors(
+                startPos,
+                endPos,
+                rocket.travelProgress,
+            );
 
             // Orient rocket towards direction of travel
-            const lookAheadProgress = Math.min(1, Math.max(0, rocket.travelProgress + (0.02 * rocket.direction)));
+            const lookAheadProgress = Math.min(1, rocket.travelProgress + 0.02);
             const targetPos = new THREE.Vector3();
-            targetPos.lerpVectors(homePos, planetPos, lookAheadProgress);
+            targetPos.lerpVectors(startPos, endPos, lookAheadProgress);
             rocket.mesh.lookAt(targetPos);
 
             // Pulse the engine glow - need to search in nested group
             const rocketMesh = rocket.mesh.children[0]; // First child is the rocketMesh group
             if (rocketMesh) {
                 const glow = rocketMesh.children.find(
-                    (child) => child instanceof THREE.Sprite
+                    (child) => child instanceof THREE.Sprite,
                 ) as THREE.Sprite | undefined;
 
                 if (glow && glow.material instanceof THREE.SpriteMaterial) {
@@ -357,15 +459,15 @@ export class RocketManager {
                 const randomOffset = new THREE.Vector3(
                     (Math.random() - 0.5) * spreadAmount,
                     (Math.random() - 0.5) * spreadAmount,
-                    (Math.random() - 0.5) * spreadAmount
+                    (Math.random() - 0.5) * spreadAmount,
                 );
 
                 rocket.trailPositions.unshift(
                     new THREE.Vector3(
                         rocket.mesh.position.x + randomOffset.x,
                         rocket.mesh.position.y + randomOffset.y,
-                        rocket.mesh.position.z + randomOffset.z
-                    )
+                        rocket.mesh.position.z + randomOffset.z,
+                    ),
                 );
 
                 // Keep trail length limited
@@ -374,11 +476,14 @@ export class RocketManager {
                 }
 
                 // Update trail geometry with dynamic effects
-                const positions = rocket.trail.geometry.getAttribute('position');
+                const positions =
+                    rocket.trail.geometry.getAttribute('position');
                 const sizes = rocket.trail.geometry.getAttribute('size');
                 const colors = rocket.trail.geometry.getAttribute('color');
 
-                const baseColor = new THREE.Color(getPriorityColor(rocket.mission.priority));
+                const baseColor = new THREE.Color(
+                    getPriorityColor(rocket.mission.priority),
+                );
                 const time = Date.now() * 0.001;
 
                 for (let i = 0; i < maxTrailLength; i++) {
@@ -387,23 +492,32 @@ export class RocketManager {
                         positions.setXYZ(i, pos.x, pos.y, pos.z);
 
                         // Dynamic size with faster, more dramatic pulse
-                        const baseFade = (1 - i / maxTrailLength);
+                        const baseFade = 1 - i / maxTrailLength;
                         const pulse = Math.sin(time * 3 + i * 0.2) * 0.4 + 0.6;
                         sizes.setX(i, baseFade * 3 * pulse);
 
                         // Animated color intensity
-                        const colorPulse = Math.sin(time * 2 + i * 0.15) * 0.3 + 0.7;
+                        const colorPulse =
+                            Math.sin(time * 2 + i * 0.15) * 0.3 + 0.7;
                         colors.setXYZ(
                             i,
                             baseColor.r * (0.5 + baseFade * 0.5) * colorPulse,
                             baseColor.g * (0.5 + baseFade * 0.5) * colorPulse,
-                            baseColor.b * (0.5 + baseFade * 0.5) * colorPulse
+                            baseColor.b * (0.5 + baseFade * 0.5) * colorPulse,
                         );
                     } else {
                         // Fill remaining with last position
-                        const lastPos = rocket.trailPositions[rocket.trailPositions.length - 1];
+                        const lastPos =
+                            rocket.trailPositions[
+                                rocket.trailPositions.length - 1
+                            ];
                         if (lastPos) {
-                            positions.setXYZ(i, lastPos.x, lastPos.y, lastPos.z);
+                            positions.setXYZ(
+                                i,
+                                lastPos.x,
+                                lastPos.y,
+                                lastPos.z,
+                            );
                             sizes.setX(i, 0);
                             colors.setXYZ(i, 0, 0, 0);
                         }
@@ -435,8 +549,30 @@ export class RocketManager {
      */
     addRocket(
         mission: Mission3D,
-        planet: Planet3D
+        planet: Planet3D,
+        getPlanetById?: (id: number) => Planet3D | undefined,
     ): void {
+        // Build route - if planet_route exists, use it; otherwise use single planet
+        const route: Planet3D[] = [];
+        if (
+            mission.planet_route &&
+            mission.planet_route.length > 0 &&
+            getPlanetById
+        ) {
+            // Multi-planet route
+            for (const planetId of mission.planet_route) {
+                const routePlanet = getPlanetById(planetId);
+                if (routePlanet) {
+                    route.push(routePlanet);
+                }
+            }
+        } else {
+            // Single planet (backward compatibility)
+            route.push(planet);
+        }
+
+        if (route.length === 0) return;
+
         const mesh = createRocket(mission);
         const orbitRadius = planet.orbit_radius || 20;
         const speed = getRocketSpeed(mission.commitment_type || 'one_time');
@@ -444,13 +580,13 @@ export class RocketManager {
         // Start at home base (0, 0, 0)
         mesh.position.set(0, 0, 0);
 
-        // Point rocket towards planet
-        const planetPos = new THREE.Vector3(
-            planet.position_x || 0,
-            planet.position_y || 0,
-            planet.position_z || 0
+        // Point rocket towards first planet in route
+        const firstPlanetPos = new THREE.Vector3(
+            route[0].position_x || 0,
+            route[0].position_y || 0,
+            route[0].position_z || 0,
         );
-        mesh.lookAt(planetPos);
+        mesh.lookAt(firstPlanetPos);
 
         this.scene.add(mesh);
 
@@ -458,12 +594,23 @@ export class RocketManager {
         const trail = createTrail(getPriorityColor(mission.priority));
         this.scene.add(trail);
 
-        // Create dotted path line
+        // Create dotted path line showing full route
         const homePos = new THREE.Vector3(0, 0, 0);
+        const pathPoints: THREE.Vector3[] = [homePos];
+        for (const routePlanet of route) {
+            pathPoints.push(
+                new THREE.Vector3(
+                    routePlanet.position_x || 0,
+                    routePlanet.position_y || 0,
+                    routePlanet.position_z || 0,
+                ),
+            );
+        }
+        pathPoints.push(homePos); // Return to home
+
         const pathLine = createRocketPathLine(
-            homePos,
-            planetPos,
-            getPriorityColor(mission.priority)
+            pathPoints,
+            getPriorityColor(mission.priority),
         );
         this.scene.add(pathLine);
 
@@ -471,6 +618,8 @@ export class RocketManager {
             mesh,
             mission,
             planet,
+            route: route.length > 1 ? route : undefined, // Only set if multi-planet
+            currentSegment: 0,
             angle: 0, // Kept for compatibility
             orbitRadius,
             speed,

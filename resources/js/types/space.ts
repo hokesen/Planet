@@ -27,18 +27,36 @@ export interface Galaxy3D {
     planets: Planet3D[];
 }
 
+export interface MissionRefuel {
+    id: number;
+    mission_id: number;
+    refueled_at: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface FuelStatus {
+    needs_refuel: boolean;
+    fuel_remaining_seconds: number | null;
+    last_refuel_date: string | null;
+    next_refuel_due: string | null;
+}
+
 export interface Mission3D {
     id: number;
     planet_id: number;
+    planet_route?: number[];
     title: string;
     description: string | null;
-    status: 'pending' | 'in_progress' | 'completed' | 'blocked';
+    status: 'todo' | 'in_progress' | 'completed' | 'blocked' | 'cancelled';
     priority: 'low' | 'medium' | 'high' | 'critical';
     deadline: string | null;
     completed_at: string | null;
     time_commitment_minutes?: number;
     commitment_type?: 'one_time' | 'daily' | 'weekly' | 'monthly';
     counts_toward_capacity?: boolean;
+    fuel_status?: FuelStatus;
+    refuels?: MissionRefuel[];
 }
 
 export interface SpaceScene {
@@ -72,6 +90,8 @@ export interface RocketInstance {
     mesh: THREE.Object3D;
     mission: Mission3D;
     planet: Planet3D;
+    route?: Planet3D[]; // Multi-planet route
+    currentSegment?: number; // Current segment index in the route
     angle: number; // Kept for compatibility
     orbitRadius: number; // Kept for compatibility
     speed: number;

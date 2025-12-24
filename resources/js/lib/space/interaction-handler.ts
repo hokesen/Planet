@@ -1,5 +1,5 @@
+import type { Galaxy3D, Mission3D, Planet3D } from '@/types/space';
 import * as THREE from 'three';
-import type { Mission3D, Planet3D, Galaxy3D } from '@/types/space';
 
 export interface InteractionCallbacks {
     onRocketClick?: (mission: Mission3D) => void;
@@ -25,7 +25,7 @@ export class InteractionHandler {
         private camera: THREE.Camera,
         private scene: THREE.Scene,
         private domElement: HTMLElement,
-        private callbacks: InteractionCallbacks
+        private callbacks: InteractionCallbacks,
     ) {
         this.raycaster = new THREE.Raycaster();
         this.mouse = new THREE.Vector2();
@@ -34,12 +34,12 @@ export class InteractionHandler {
         if (this.camera instanceof THREE.PerspectiveCamera) {
             this.cameraAngle = Math.atan2(
                 this.camera.position.z,
-                this.camera.position.x
+                this.camera.position.x,
             );
             this.cameraDistance = Math.sqrt(
                 this.camera.position.x ** 2 +
-                this.camera.position.y ** 2 +
-                this.camera.position.z ** 2
+                    this.camera.position.y ** 2 +
+                    this.camera.position.z ** 2,
             );
         }
 
@@ -47,12 +47,20 @@ export class InteractionHandler {
         this.domElement.addEventListener('click', this.onClick.bind(this));
         this.domElement.addEventListener(
             'mousemove',
-            this.onMouseMove.bind(this)
+            this.onMouseMove.bind(this),
         );
-        this.domElement.addEventListener('mousedown', this.onMouseDown.bind(this));
+        this.domElement.addEventListener(
+            'mousedown',
+            this.onMouseDown.bind(this),
+        );
         this.domElement.addEventListener('mouseup', this.onMouseUp.bind(this));
-        this.domElement.addEventListener('mouseleave', this.onMouseUp.bind(this));
-        this.domElement.addEventListener('wheel', this.onWheel.bind(this), { passive: false });
+        this.domElement.addEventListener(
+            'mouseleave',
+            this.onMouseUp.bind(this),
+        );
+        this.domElement.addEventListener('wheel', this.onWheel.bind(this), {
+            passive: false,
+        });
     }
 
     /**
@@ -82,13 +90,18 @@ export class InteractionHandler {
         if (intersects.length > 0) {
             // Find the first object with userData
             const clickedObject = this.findInteractableObject(
-                intersects[0].object
+                intersects[0].object,
             );
 
             if (clickedObject) {
-                const { type, mission, planet, galaxy } = clickedObject.userData;
+                const { type, mission, planet, galaxy } =
+                    clickedObject.userData;
 
-                if (type === 'rocket' && mission && this.callbacks.onRocketClick) {
+                if (
+                    type === 'rocket' &&
+                    mission &&
+                    this.callbacks.onRocketClick
+                ) {
                     this.callbacks.onRocketClick(mission as Mission3D);
                 } else if (
                     type === 'planet' &&
@@ -122,10 +135,7 @@ export class InteractionHandler {
      */
     private onMouseDown(event: MouseEvent): void {
         const rect = this.domElement.getBoundingClientRect();
-        this.dragStart.set(
-            event.clientX - rect.left,
-            event.clientY - rect.top
-        );
+        this.dragStart.set(event.clientX - rect.left, event.clientY - rect.top);
         this.isDragging = true;
         this.domElement.style.cursor = 'grabbing';
     }
@@ -150,17 +160,30 @@ export class InteractionHandler {
             this.cameraDistance += event.deltaY * zoomSpeed;
 
             // Clamp distance to reasonable values
-            this.cameraDistance = Math.max(50, Math.min(500, this.cameraDistance));
+            this.cameraDistance = Math.max(
+                50,
+                Math.min(500, this.cameraDistance),
+            );
 
             // Update camera position maintaining the current angle
             const horizontalRadius = Math.sqrt(
-                this.camera.position.x ** 2 + this.camera.position.z ** 2
+                this.camera.position.x ** 2 + this.camera.position.z ** 2,
             );
-            const verticalAngle = Math.atan2(this.camera.position.y, horizontalRadius);
+            const verticalAngle = Math.atan2(
+                this.camera.position.y,
+                horizontalRadius,
+            );
 
-            this.camera.position.x = Math.cos(this.cameraAngle) * Math.cos(verticalAngle) * this.cameraDistance;
-            this.camera.position.y = Math.sin(verticalAngle) * this.cameraDistance;
-            this.camera.position.z = Math.sin(this.cameraAngle) * Math.cos(verticalAngle) * this.cameraDistance;
+            this.camera.position.x =
+                Math.cos(this.cameraAngle) *
+                Math.cos(verticalAngle) *
+                this.cameraDistance;
+            this.camera.position.y =
+                Math.sin(verticalAngle) * this.cameraDistance;
+            this.camera.position.z =
+                Math.sin(this.cameraAngle) *
+                Math.cos(verticalAngle) *
+                this.cameraDistance;
             this.camera.lookAt(0, -10, 0);
         }
     }
@@ -183,12 +206,21 @@ export class InteractionHandler {
             // Update camera position maintaining the current distance
             if (this.camera instanceof THREE.PerspectiveCamera) {
                 const horizontalRadius = Math.sqrt(
-                    this.camera.position.x ** 2 + this.camera.position.z ** 2
+                    this.camera.position.x ** 2 + this.camera.position.z ** 2,
                 );
-                const verticalAngle = Math.atan2(this.camera.position.y, horizontalRadius);
+                const verticalAngle = Math.atan2(
+                    this.camera.position.y,
+                    horizontalRadius,
+                );
 
-                this.camera.position.x = Math.cos(this.cameraAngle) * Math.cos(verticalAngle) * this.cameraDistance;
-                this.camera.position.z = Math.sin(this.cameraAngle) * Math.cos(verticalAngle) * this.cameraDistance;
+                this.camera.position.x =
+                    Math.cos(this.cameraAngle) *
+                    Math.cos(verticalAngle) *
+                    this.cameraDistance;
+                this.camera.position.z =
+                    Math.sin(this.cameraAngle) *
+                    Math.cos(verticalAngle) *
+                    this.cameraDistance;
                 this.camera.lookAt(0, -10, 0);
             }
 
@@ -207,7 +239,7 @@ export class InteractionHandler {
 
         if (intersects.length > 0) {
             const hoveredObject = this.findInteractableObject(
-                intersects[0].object
+                intersects[0].object,
             );
 
             if (hoveredObject) {
@@ -226,7 +258,7 @@ export class InteractionHandler {
      * Find the interactable parent object (rocket, planet, black hole, or wormhole)
      */
     private findInteractableObject(
-        object: THREE.Object3D
+        object: THREE.Object3D,
     ): THREE.Object3D | null {
         let current: THREE.Object3D | null = object;
 
@@ -256,7 +288,8 @@ export class InteractionHandler {
             // Brighten planet
             object.traverse((child) => {
                 if (child instanceof THREE.Mesh) {
-                    const material = child.material as THREE.MeshStandardMaterial;
+                    const material =
+                        child.material as THREE.MeshStandardMaterial;
                     if (material.emissive) {
                         material.emissiveIntensity = 0.5;
                     }
@@ -285,7 +318,8 @@ export class InteractionHandler {
             // Reset brightness
             object.traverse((child) => {
                 if (child instanceof THREE.Mesh) {
-                    const material = child.material as THREE.MeshStandardMaterial;
+                    const material =
+                        child.material as THREE.MeshStandardMaterial;
                     if (material.emissive) {
                         material.emissiveIntensity = 0.2;
                     }
@@ -324,11 +358,20 @@ export class InteractionHandler {
         this.domElement.removeEventListener('click', this.onClick.bind(this));
         this.domElement.removeEventListener(
             'mousemove',
-            this.onMouseMove.bind(this)
+            this.onMouseMove.bind(this),
         );
-        this.domElement.removeEventListener('mousedown', this.onMouseDown.bind(this));
-        this.domElement.removeEventListener('mouseup', this.onMouseUp.bind(this));
-        this.domElement.removeEventListener('mouseleave', this.onMouseUp.bind(this));
+        this.domElement.removeEventListener(
+            'mousedown',
+            this.onMouseDown.bind(this),
+        );
+        this.domElement.removeEventListener(
+            'mouseup',
+            this.onMouseUp.bind(this),
+        );
+        this.domElement.removeEventListener(
+            'mouseleave',
+            this.onMouseUp.bind(this),
+        );
         this.domElement.removeEventListener('wheel', this.onWheel.bind(this));
 
         if (this.hoveredObject) {

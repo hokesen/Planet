@@ -72,12 +72,16 @@ class PerlinNoise {
 
         return this.lerp(
             v,
-            this.lerp(u, this.grad(this.p[aa], x, y), this.grad(this.p[ba], x - 1, y)),
+            this.lerp(
+                u,
+                this.grad(this.p[aa], x, y),
+                this.grad(this.p[ba], x - 1, y),
+            ),
             this.lerp(
                 u,
                 this.grad(this.p[ab], x, y - 1),
-                this.grad(this.p[bb], x - 1, y - 1)
-            )
+                this.grad(this.p[bb], x - 1, y - 1),
+            ),
         );
     }
 }
@@ -90,7 +94,7 @@ function octaveNoise(
     x: number,
     y: number,
     octaves: number,
-    persistence: number
+    persistence: number,
 ): number {
     let total = 0;
     let frequency = 1;
@@ -146,7 +150,7 @@ function generateTerrainColors(seed: number) {
         iceR = Math.floor(250 + random(seed * 3.71) * 5);
         iceG = Math.floor(250 + random(seed * 3.72) * 5);
         iceB = Math.floor(250 + random(seed * 3.73) * 5);
-    } else if (iceColorType < 0.30) {
+    } else if (iceColorType < 0.3) {
         // Deep blue ice caps (frozen nitrogen)
         iceR = Math.floor(150 + random(seed * 3.74) * 50);
         iceG = Math.floor(180 + random(seed * 3.75) * 40);
@@ -156,9 +160,9 @@ function generateTerrainColors(seed: number) {
         iceR = Math.floor(240 + random(seed * 3.77) * 15);
         iceG = Math.floor(180 + random(seed * 3.78) * 40);
         iceB = Math.floor(230 + random(seed * 3.79) * 25);
-    } else if (iceColorType < 0.60) {
+    } else if (iceColorType < 0.6) {
         // Amber/orange ice caps (sulfur deposits)
-        iceR = Math.floor(240 + random(seed * 3.80) * 15);
+        iceR = Math.floor(240 + random(seed * 3.8) * 15);
         iceG = Math.floor(200 + random(seed * 3.81) * 40);
         iceB = Math.floor(140 + random(seed * 3.82) * 50);
     } else if (iceColorType < 0.75) {
@@ -166,7 +170,7 @@ function generateTerrainColors(seed: number) {
         iceR = Math.floor(180 + random(seed * 3.83) * 40);
         iceG = Math.floor(240 + random(seed * 3.84) * 15);
         iceB = Math.floor(220 + random(seed * 3.85) * 35);
-    } else if (iceColorType < 0.90) {
+    } else if (iceColorType < 0.9) {
         // Purple/violet ice caps (exotic compounds)
         iceR = Math.floor(200 + random(seed * 3.86) * 40);
         iceG = Math.floor(170 + random(seed * 3.87) * 50);
@@ -174,7 +178,7 @@ function generateTerrainColors(seed: number) {
     } else {
         // Pale green ice caps (chlorine ice)
         iceR = Math.floor(190 + random(seed * 3.89) * 40);
-        iceG = Math.floor(240 + random(seed * 3.90) * 15);
+        iceG = Math.floor(240 + random(seed * 3.9) * 15);
         iceB = Math.floor(190 + random(seed * 3.91) * 40);
     }
 
@@ -182,7 +186,11 @@ function generateTerrainColors(seed: number) {
         deepOcean: { r: oceanR, g: oceanG, b: oceanB },
         ocean: { r: oceanR + 15, g: oceanG + 30, b: oceanB + 60 },
         shallowOcean: { r: oceanR + 35, g: oceanG + 70, b: oceanB + 90 },
-        beach: { r: 194 + random(seed * 4.1) * 40, g: 178 + random(seed * 4.2) * 40, b: 128 + random(seed * 4.3) * 40 },
+        beach: {
+            r: 194 + random(seed * 4.1) * 40,
+            g: 178 + random(seed * 4.2) * 40,
+            b: 128 + random(seed * 4.3) * 40,
+        },
         lowland: { r: landR, g: landG, b: landB },
         highland: { r: landR + 20, g: landG + 20, b: landB + 10 },
         mountain: { r: 120, g: 110, b: 100 },
@@ -193,7 +201,11 @@ function generateTerrainColors(seed: number) {
 /**
  * Interpolate between two colors
  */
-function lerpColor(color1: TerrainColor, color2: TerrainColor, t: number): TerrainColor {
+function lerpColor(
+    color1: TerrainColor,
+    color2: TerrainColor,
+    t: number,
+): TerrainColor {
     return {
         r: Math.floor(color1.r + (color2.r - color1.r) * t),
         g: Math.floor(color1.g + (color2.g - color1.g) * t),
@@ -212,7 +224,7 @@ function getTerrainColor(
     iceCapSize: number,
     iceCapAsymmetry: number,
     spiralNoise: number,
-    patchNoise: number
+    patchNoise: number,
 ): TerrainColor {
     // Ice caps at poles with much more dramatic variation
     const polarDistance = Math.abs(latitude);
@@ -222,14 +234,17 @@ function getTerrainColor(
     const baseThreshold = 0.75 + iceCapSize * 0.2;
 
     // Asymmetric ice caps (north vs south poles can be different sizes)
-    const asymmetryFactor = latitude > 0 ? 1 + iceCapAsymmetry * 0.3 : 1 - iceCapAsymmetry * 0.3;
+    const asymmetryFactor =
+        latitude > 0 ? 1 + iceCapAsymmetry * 0.3 : 1 - iceCapAsymmetry * 0.3;
 
     // Complex shape using multiple noise layers
     const jaggedBoundary = jaggedNoise * 0.2; // Jagged edges
     const spiralEffect = spiralNoise * 0.1; // Spiral patterns
     const patchEffect = patchNoise > 0.6 ? 0.05 : 0; // Random patches
 
-    const iceCapThreshold = (baseThreshold + jaggedBoundary + spiralEffect + patchEffect) * asymmetryFactor;
+    const iceCapThreshold =
+        (baseThreshold + jaggedBoundary + spiralEffect + patchEffect) *
+        asymmetryFactor;
 
     if (polarDistance > iceCapThreshold && height > 0.3) {
         return terrainColors.snowCap;
@@ -267,7 +282,7 @@ function getTerrainColor(
  */
 export function generatePlanetTexture(
     size: number = 512,
-    seed?: number
+    seed?: number,
 ): HTMLCanvasElement {
     const canvas = document.createElement('canvas');
     canvas.width = size;
@@ -306,7 +321,7 @@ export function generatePlanetTexture(
 
             // Latitude and longitude
             const lat = (v - 0.5) * Math.PI; // -π/2 to π/2
-            const lon = u * Math.PI * 2;     // 0 to 2π
+            const lon = u * Math.PI * 2; // 0 to 2π
 
             // Spherical to 3D coordinates
             let sx = Math.cos(lat) * Math.cos(lon);
@@ -334,13 +349,7 @@ export function generatePlanetTexture(
 
             // Sample noise in 3D space (project to 2D)
             const scale = 4;
-            const height = octaveNoise(
-                noise,
-                sx * scale,
-                sy * scale,
-                6,
-                0.5
-            );
+            const height = octaveNoise(noise, sx * scale, sy * scale, 6, 0.5);
 
             // Normalize height to 0-1
             const normalizedHeight = (height + 1) / 2;
@@ -350,7 +359,13 @@ export function generatePlanetTexture(
 
             // Generate multiple noise layers for complex ice cap shapes
             const jaggedNoise = octaveNoise(noise, lon * 8, lat * 8, 3, 0.5);
-            const spiralNoise = octaveNoise(noise, lon * 12 + lat * 6, lat * 12, 4, 0.6);
+            const spiralNoise = octaveNoise(
+                noise,
+                lon * 12 + lat * 6,
+                lat * 12,
+                4,
+                0.6,
+            );
             const patchNoise = octaveNoise(noise, lon * 16, lat * 16, 2, 0.4);
 
             // Get terrain color with enhanced ice cap parameters
@@ -362,7 +377,7 @@ export function generatePlanetTexture(
                 iceCapSize,
                 iceCapAsymmetry,
                 spiralNoise,
-                patchNoise
+                patchNoise,
             );
 
             // Add slight variation for texture

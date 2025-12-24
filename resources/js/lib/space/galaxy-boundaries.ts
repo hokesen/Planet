@@ -1,5 +1,5 @@
-import * as THREE from 'three';
 import type { Galaxy3D } from '@/types/space';
+import * as THREE from 'three';
 
 /**
  * Calculate the center point of all planets in a galaxy
@@ -22,14 +22,17 @@ function calculateGalaxyCenter(galaxy: Galaxy3D): THREE.Vector3 {
     return new THREE.Vector3(
         sumX / galaxy.planets.length,
         sumY / galaxy.planets.length,
-        sumZ / galaxy.planets.length
+        sumZ / galaxy.planets.length,
     );
 }
 
 /**
  * Calculate the radius needed to encompass all planets in a galaxy
  */
-function calculateGalaxyRadius(galaxy: Galaxy3D, center: THREE.Vector3): number {
+function calculateGalaxyRadius(
+    galaxy: Galaxy3D,
+    center: THREE.Vector3,
+): number {
     if (galaxy.planets.length === 0) {
         return 50; // Default radius
     }
@@ -40,7 +43,7 @@ function calculateGalaxyRadius(galaxy: Galaxy3D, center: THREE.Vector3): number 
         const planetPos = new THREE.Vector3(
             planet.position_x || 0,
             planet.position_y || 0,
-            planet.position_z || 0
+            planet.position_z || 0,
         );
         const distance = center.distanceTo(planetPos);
         if (distance > maxDistance) {
@@ -55,7 +58,9 @@ function calculateGalaxyRadius(galaxy: Galaxy3D, center: THREE.Vector3): number 
 /**
  * Create a dotted line sphere boundary for a galaxy
  */
-export function createGalaxyBoundary(galaxy: Galaxy3D): THREE.LineSegments | null {
+export function createGalaxyBoundary(
+    galaxy: Galaxy3D,
+): THREE.LineSegments | null {
     if (galaxy.planets.length === 0) {
         return null;
     }
@@ -95,7 +100,7 @@ export function createGalaxyBoundary(galaxy: Galaxy3D): THREE.LineSegments | nul
  */
 export function createAllGalaxyBoundaries(
     scene: THREE.Scene,
-    galaxies: Galaxy3D[]
+    galaxies: Galaxy3D[],
 ): THREE.LineSegments[] {
     const boundaries: THREE.LineSegments[] = [];
 
@@ -115,7 +120,7 @@ export function createAllGalaxyBoundaries(
  */
 export function removeGalaxyBoundaries(
     scene: THREE.Scene,
-    boundaries: THREE.LineSegments[]
+    boundaries: THREE.LineSegments[],
 ): void {
     boundaries.forEach((boundary) => {
         scene.remove(boundary);

@@ -1,10 +1,13 @@
-import * as THREE from 'three';
 import type { Galaxy3D } from '@/types/space';
+import * as THREE from 'three';
 
 /**
  * Create a text sprite label for galaxy name
  */
-function createTextSprite(text: string, color: string = '#ffffff'): THREE.Sprite {
+function createTextSprite(
+    text: string,
+    color: string = '#ffffff',
+): THREE.Sprite {
     const canvas = document.createElement('canvas');
     const context = canvas.getContext('2d')!;
 
@@ -23,7 +26,10 @@ function createTextSprite(text: string, color: string = '#ffffff'): THREE.Sprite
 
     // Create sprite
     const texture = new THREE.CanvasTexture(canvas);
-    const material = new THREE.SpriteMaterial({ map: texture, transparent: true });
+    const material = new THREE.SpriteMaterial({
+        map: texture,
+        transparent: true,
+    });
     const sprite = new THREE.Sprite(material);
 
     // Scale sprite
@@ -53,14 +59,17 @@ export function calculateGalaxyCenter(galaxy: Galaxy3D): THREE.Vector3 {
     return new THREE.Vector3(
         sumX / galaxy.planets.length,
         sumY / galaxy.planets.length,
-        sumZ / galaxy.planets.length
+        sumZ / galaxy.planets.length,
     );
 }
 
 /**
  * Create a black hole mesh - simple, small, and purely black
  */
-export function createBlackHole(galaxy: Galaxy3D, center: THREE.Vector3): THREE.Group {
+export function createBlackHole(
+    galaxy: Galaxy3D,
+    center: THREE.Vector3,
+): THREE.Group {
     const group = new THREE.Group();
     const galaxyColor = new THREE.Color(galaxy.color);
 
@@ -77,7 +86,7 @@ export function createBlackHole(galaxy: Galaxy3D, center: THREE.Vector3): THREE.
     const ringGeometry = new THREE.RingGeometry(
         blackHoleRadius * 1.1,
         blackHoleRadius * 1.3,
-        64
+        64,
     );
     const ringMaterial = new THREE.MeshBasicMaterial({
         color: galaxyColor,
@@ -117,7 +126,7 @@ export class BlackHoleManager {
 
     constructor(
         private scene: THREE.Scene,
-        private galaxies: Galaxy3D[]
+        private galaxies: Galaxy3D[],
     ) {}
 
     /**

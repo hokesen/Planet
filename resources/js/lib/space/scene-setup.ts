@@ -1,5 +1,5 @@
-import * as THREE from 'three';
 import type { Galaxy3D } from '@/types/space';
+import * as THREE from 'three';
 
 export interface SceneSetupConfig {
     canvas: HTMLCanvasElement;
@@ -45,10 +45,7 @@ export function setupScene(canvas: HTMLCanvasElement): SceneComponents {
 /**
  * Add lighting to the scene
  */
-export function setupLighting(
-    scene: THREE.Scene,
-    galaxies: Galaxy3D[]
-): void {
+export function setupLighting(scene: THREE.Scene, galaxies: Galaxy3D[]): void {
     // Ambient light for base visibility
     const ambient = new THREE.AmbientLight(0x404040, 1.5);
     scene.add(ambient);
@@ -71,8 +68,8 @@ export function setupLighting(
         const radius = 200;
         light.position.set(
             Math.cos(angle) * radius,
-            (index % 3 - 1) * 50,
-            Math.sin(angle) * radius
+            ((index % 3) - 1) * 50,
+            Math.sin(angle) * radius,
         );
 
         scene.add(light);
@@ -93,7 +90,7 @@ export function addStarfield(scene: THREE.Scene): void {
 
     starsGeometry.setAttribute(
         'position',
-        new THREE.BufferAttribute(positions, 3)
+        new THREE.BufferAttribute(positions, 3),
     );
 
     const starsMaterial = new THREE.PointsMaterial({
@@ -153,10 +150,14 @@ export function addHomeBase(scene: THREE.Scene): THREE.Group {
     for (let i = 0; i < 5; i++) {
         const innerRadius = 7 + i * 2;
         const outerRadius = innerRadius + 1.5;
-        const ringGeometry = new THREE.RingGeometry(innerRadius, outerRadius, 64);
+        const ringGeometry = new THREE.RingGeometry(
+            innerRadius,
+            outerRadius,
+            64,
+        );
 
         // Gradient from purple to cyan for wormhole effect
-        const colors = [0x9D00FF, 0x7700FF, 0x4400FF, 0x0088FF, 0x00FFFF];
+        const colors = [0x9d00ff, 0x7700ff, 0x4400ff, 0x0088ff, 0x00ffff];
         const ringMaterial = new THREE.MeshBasicMaterial({
             color: colors[i],
             side: THREE.DoubleSide,
@@ -190,7 +191,7 @@ export function addHomeBase(scene: THREE.Scene): THREE.Group {
 export function handleResize(
     canvas: HTMLCanvasElement,
     camera: THREE.PerspectiveCamera,
-    renderer: THREE.WebGLRenderer
+    renderer: THREE.WebGLRenderer,
 ): void {
     const rect = canvas.getBoundingClientRect();
     const aspect = rect.width / rect.height;

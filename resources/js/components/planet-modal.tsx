@@ -1,3 +1,8 @@
+import {
+    destroy,
+    store,
+    update,
+} from '@/actions/App/Http/Controllers/PlanetController';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -17,12 +22,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import {
-    store,
-    update,
-    destroy,
-} from '@/actions/App/Http/Controllers/PlanetController';
-import type { Planet3D, Galaxy3D } from '@/types/space';
+import type { Galaxy3D, Planet3D } from '@/types/space';
 import { useForm } from '@inertiajs/react';
 import { Globe, Trash2 } from 'lucide-react';
 import { useEffect } from 'react';
@@ -95,7 +95,11 @@ export default function PlanetModal({
 
     const handleDelete = () => {
         if (!planet) return;
-        if (confirm('Are you sure you want to delete this planet? All missions on this planet will also be deleted.')) {
+        if (
+            confirm(
+                'Are you sure you want to delete this planet? All missions on this planet will also be deleted.',
+            )
+        ) {
             form.delete(destroy.url(planet.id), {
                 onSuccess: () => {
                     onClose();
@@ -145,7 +149,8 @@ export default function PlanetModal({
                                             <span
                                                 className="inline-block h-2 w-2 rounded-full"
                                                 style={{
-                                                    backgroundColor: galaxy.color,
+                                                    backgroundColor:
+                                                        galaxy.color,
                                                 }}
                                             />
                                             {galaxy.icon} {galaxy.name}
@@ -197,7 +202,7 @@ export default function PlanetModal({
                                             | 'small'
                                             | 'medium'
                                             | 'large'
-                                            | 'massive'
+                                            | 'massive',
                                     )
                                 }
                             >
@@ -255,7 +260,7 @@ export default function PlanetModal({
                                         value as
                                             | 'active'
                                             | 'completed'
-                                            | 'archived'
+                                            | 'archived',
                                     )
                                 }
                             >
@@ -278,9 +283,7 @@ export default function PlanetModal({
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="health_status">
-                                Health Status
-                            </Label>
+                            <Label htmlFor="health_status">Health Status</Label>
                             <Select
                                 value={form.data.health_status}
                                 onValueChange={(value) =>
@@ -290,7 +293,7 @@ export default function PlanetModal({
                                             | 'critical'
                                             | 'at_risk'
                                             | 'stable'
-                                            | 'thriving'
+                                            | 'thriving',
                                     )
                                 }
                             >
@@ -327,7 +330,7 @@ export default function PlanetModal({
                             onChange={(e) =>
                                 form.setData(
                                     'target_completion_date',
-                                    e.target.value
+                                    e.target.value,
                                 )
                             }
                         />

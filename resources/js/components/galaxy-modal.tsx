@@ -1,5 +1,7 @@
+import type { Galaxy3D } from '@/types/space';
 import { useForm } from '@inertiajs/react';
 import { FormEventHandler, useEffect } from 'react';
+import InputError from './input-error';
 import { Button } from './ui/button';
 import {
     Dialog,
@@ -11,8 +13,6 @@ import {
 } from './ui/dialog';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import InputError from './input-error';
-import type { Galaxy3D } from '@/types/space';
 
 export interface GalaxyModalProps {
     galaxy: Galaxy3D | null;
@@ -27,7 +27,16 @@ export default function GalaxyModal({
 }: GalaxyModalProps) {
     const isEdit = !!galaxy;
 
-    const { data, setData, post, patch, delete: destroy, processing, errors, reset } = useForm({
+    const {
+        data,
+        setData,
+        post,
+        patch,
+        delete: destroy,
+        processing,
+        errors,
+        reset,
+    } = useForm({
         name: galaxy?.name || '',
         color: galaxy?.color || '#4ECDC4',
         icon: galaxy?.icon || '',
@@ -72,7 +81,7 @@ export default function GalaxyModal({
 
         if (
             confirm(
-                `Are you sure you want to delete "${galaxy.name}"? This will also delete all planets and missions in this galaxy.`
+                `Are you sure you want to delete "${galaxy.name}"? This will also delete all planets and missions in this galaxy.`,
             )
         ) {
             destroy(`/galaxies/${galaxy.id}`, {

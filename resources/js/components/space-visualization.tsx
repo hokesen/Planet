@@ -1,21 +1,21 @@
-import { useEffect, useRef } from 'react';
-import * as THREE from 'three';
-import type { Galaxy3D, Planet3D, Mission3D } from '@/types/space';
-import {
-    setupScene,
-    setupLighting,
-    addStarfield,
-    addHomeBase,
-    handleResize,
-} from '@/lib/space/scene-setup';
-import { PlanetManager } from '@/lib/space/planet-manager';
-import { RocketManager } from '@/lib/space/rocket-manager';
 import { BlackHoleManager } from '@/lib/space/black-hole-manager';
-import { InteractionHandler } from '@/lib/space/interaction-handler';
 import {
     createAllGalaxyBoundaries,
     removeGalaxyBoundaries,
 } from '@/lib/space/galaxy-boundaries';
+import { InteractionHandler } from '@/lib/space/interaction-handler';
+import { PlanetManager } from '@/lib/space/planet-manager';
+import { RocketManager } from '@/lib/space/rocket-manager';
+import {
+    addHomeBase,
+    addStarfield,
+    handleResize,
+    setupLighting,
+    setupScene,
+} from '@/lib/space/scene-setup';
+import type { Galaxy3D, Mission3D, Planet3D } from '@/types/space';
+import { useEffect, useRef } from 'react';
+import * as THREE from 'three';
 
 export interface SpaceVisualizationProps {
     galaxies: Galaxy3D[];
@@ -47,9 +47,19 @@ export function SpaceVisualization({
     } | null>(null);
 
     // Store callbacks in refs to avoid recreating the scene when they change
-    const callbacksRef = useRef({ onRocketClick, onPlanetClick, onGalaxyClick, onWormholeClick });
+    const callbacksRef = useRef({
+        onRocketClick,
+        onPlanetClick,
+        onGalaxyClick,
+        onWormholeClick,
+    });
     useEffect(() => {
-        callbacksRef.current = { onRocketClick, onPlanetClick, onGalaxyClick, onWormholeClick };
+        callbacksRef.current = {
+            onRocketClick,
+            onPlanetClick,
+            onGalaxyClick,
+            onWormholeClick,
+        };
     }, [onRocketClick, onPlanetClick, onGalaxyClick, onWormholeClick]);
 
     useEffect(() => {
@@ -103,11 +113,14 @@ export function SpaceVisualization({
             scene,
             canvas,
             {
-                onRocketClick: (mission) => callbacksRef.current.onRocketClick?.(mission),
-                onPlanetClick: (planet) => callbacksRef.current.onPlanetClick?.(planet),
-                onGalaxyClick: (galaxy) => callbacksRef.current.onGalaxyClick?.(galaxy),
+                onRocketClick: (mission) =>
+                    callbacksRef.current.onRocketClick?.(mission),
+                onPlanetClick: (planet) =>
+                    callbacksRef.current.onPlanetClick?.(planet),
+                onGalaxyClick: (galaxy) =>
+                    callbacksRef.current.onGalaxyClick?.(galaxy),
                 onWormholeClick: () => callbacksRef.current.onWormholeClick?.(),
-            }
+            },
         );
 
         // Add galaxy boundaries
@@ -132,7 +145,7 @@ export function SpaceVisualization({
 
             const deltaTime = Math.min(
                 (currentTime - sceneDataRef.current.lastTime) / 1000,
-                0.1
+                0.1,
             ); // Cap delta to prevent issues
             sceneDataRef.current.lastTime = currentTime;
 
@@ -151,12 +164,11 @@ export function SpaceVisualization({
             // Render scene
             sceneDataRef.current.renderer.render(
                 sceneDataRef.current.scene,
-                sceneDataRef.current.camera
+                sceneDataRef.current.camera,
             );
 
             // Continue animation
-            sceneDataRef.current.animationId =
-                requestAnimationFrame(animate);
+            sceneDataRef.current.animationId = requestAnimationFrame(animate);
         };
 
         // Start animation
@@ -168,7 +180,7 @@ export function SpaceVisualization({
             handleResize(
                 canvas,
                 sceneDataRef.current.camera,
-                sceneDataRef.current.renderer
+                sceneDataRef.current.renderer,
             );
         };
 
@@ -189,7 +201,7 @@ export function SpaceVisualization({
                 sceneDataRef.current.interactionHandler.dispose();
                 removeGalaxyBoundaries(
                     sceneDataRef.current.scene,
-                    sceneDataRef.current.galaxyBoundaries
+                    sceneDataRef.current.galaxyBoundaries,
                 );
                 sceneDataRef.current.renderer.dispose();
                 sceneDataRef.current = null;

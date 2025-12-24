@@ -144,7 +144,8 @@ export default function Dashboard({ galaxies }: { galaxies: Galaxy[] }) {
     };
 
     const toggleMissionStatus = (mission: Mission) => {
-        const newStatus = mission.status === 'completed' ? 'pending' : 'completed';
+        const newStatus =
+            mission.status === 'completed' ? 'pending' : 'completed';
         router.patch(`/missions/${mission.id}`, { status: newStatus });
     };
 
@@ -335,7 +336,11 @@ export default function Dashboard({ galaxies }: { galaxies: Galaxy[] }) {
                                                             planetForm.setData(
                                                                 'size',
                                                                 e.target
-                                                                    .value as 'small' | 'medium' | 'large' | 'massive',
+                                                                    .value as
+                                                                    | 'small'
+                                                                    | 'medium'
+                                                                    | 'large'
+                                                                    | 'massive',
                                                             )
                                                         }
                                                         className="w-full rounded-md border px-3 py-2"
@@ -414,7 +419,13 @@ export default function Dashboard({ galaxies }: { galaxies: Galaxy[] }) {
                                                                 {
                                                                     planet.health_status
                                                                 }{' '}
-                                                                · {planet.missions.length} missions
+                                                                ·{' '}
+                                                                {
+                                                                    planet
+                                                                        .missions
+                                                                        .length
+                                                                }{' '}
+                                                                missions
                                                             </p>
                                                             {planet.description && (
                                                                 <p className="mt-1 text-sm">
@@ -430,7 +441,8 @@ export default function Dashboard({ galaxies }: { galaxies: Galaxy[] }) {
                                                                 variant="outline"
                                                                 onClick={() =>
                                                                     setShowMissionForm(
-                                                                        showMissionForm === planet.id
+                                                                        showMissionForm ===
+                                                                            planet.id
                                                                             ? null
                                                                             : planet.id,
                                                                     )
@@ -452,26 +464,41 @@ export default function Dashboard({ galaxies }: { galaxies: Galaxy[] }) {
                                                         </div>
                                                     </div>
 
-                                                    {showMissionForm === planet.id && (
+                                                    {showMissionForm ===
+                                                        planet.id && (
                                                         <div className="border-t bg-muted/30 p-3">
                                                             <form
-                                                                onSubmit={(e) => {
-                                                                    missionForm.data.planet_id = planet.id;
-                                                                    handleCreateMission(e);
+                                                                onSubmit={(
+                                                                    e,
+                                                                ) => {
+                                                                    missionForm.data.planet_id =
+                                                                        planet.id;
+                                                                    handleCreateMission(
+                                                                        e,
+                                                                    );
                                                                 }}
                                                                 className="space-y-3"
                                                             >
                                                                 <div>
                                                                     <label className="mb-1 block text-sm font-medium">
-                                                                        Mission Title
+                                                                        Mission
+                                                                        Title
                                                                     </label>
                                                                     <input
                                                                         type="text"
-                                                                        value={missionForm.data.title}
-                                                                        onChange={(e) =>
+                                                                        value={
+                                                                            missionForm
+                                                                                .data
+                                                                                .title
+                                                                        }
+                                                                        onChange={(
+                                                                            e,
+                                                                        ) =>
                                                                             missionForm.setData(
                                                                                 'title',
-                                                                                e.target.value,
+                                                                                e
+                                                                                    .target
+                                                                                    .value,
                                                                             )
                                                                         }
                                                                         className="w-full rounded-md border px-3 py-2"
@@ -484,19 +511,39 @@ export default function Dashboard({ galaxies }: { galaxies: Galaxy[] }) {
                                                                             Priority
                                                                         </label>
                                                                         <select
-                                                                            value={missionForm.data.priority}
-                                                                            onChange={(e) =>
+                                                                            value={
+                                                                                missionForm
+                                                                                    .data
+                                                                                    .priority
+                                                                            }
+                                                                            onChange={(
+                                                                                e,
+                                                                            ) =>
                                                                                 missionForm.setData(
                                                                                     'priority',
-                                                                                    e.target.value as 'low' | 'medium' | 'high' | 'critical',
+                                                                                    e
+                                                                                        .target
+                                                                                        .value as
+                                                                                        | 'low'
+                                                                                        | 'medium'
+                                                                                        | 'high'
+                                                                                        | 'critical',
                                                                                 )
                                                                             }
                                                                             className="w-full rounded-md border px-3 py-2"
                                                                         >
-                                                                            <option value="low">Low</option>
-                                                                            <option value="medium">Medium</option>
-                                                                            <option value="high">High</option>
-                                                                            <option value="critical">Critical</option>
+                                                                            <option value="low">
+                                                                                Low
+                                                                            </option>
+                                                                            <option value="medium">
+                                                                                Medium
+                                                                            </option>
+                                                                            <option value="high">
+                                                                                High
+                                                                            </option>
+                                                                            <option value="critical">
+                                                                                Critical
+                                                                            </option>
                                                                         </select>
                                                                     </div>
                                                                     <div>
@@ -504,19 +551,40 @@ export default function Dashboard({ galaxies }: { galaxies: Galaxy[] }) {
                                                                             Status
                                                                         </label>
                                                                         <select
-                                                                            value={missionForm.data.status}
-                                                                            onChange={(e) =>
+                                                                            value={
+                                                                                missionForm
+                                                                                    .data
+                                                                                    .status
+                                                                            }
+                                                                            onChange={(
+                                                                                e,
+                                                                            ) =>
                                                                                 missionForm.setData(
                                                                                     'status',
-                                                                                    e.target.value as 'pending' | 'in_progress' | 'completed' | 'blocked',
+                                                                                    e
+                                                                                        .target
+                                                                                        .value as
+                                                                                        | 'pending'
+                                                                                        | 'in_progress'
+                                                                                        | 'completed'
+                                                                                        | 'blocked',
                                                                                 )
                                                                             }
                                                                             className="w-full rounded-md border px-3 py-2"
                                                                         >
-                                                                            <option value="pending">Pending</option>
-                                                                            <option value="in_progress">In Progress</option>
-                                                                            <option value="completed">Completed</option>
-                                                                            <option value="blocked">Blocked</option>
+                                                                            <option value="pending">
+                                                                                Pending
+                                                                            </option>
+                                                                            <option value="in_progress">
+                                                                                In
+                                                                                Progress
+                                                                            </option>
+                                                                            <option value="completed">
+                                                                                Completed
+                                                                            </option>
+                                                                            <option value="blocked">
+                                                                                Blocked
+                                                                            </option>
                                                                         </select>
                                                                     </div>
                                                                     <div>
@@ -525,11 +593,19 @@ export default function Dashboard({ galaxies }: { galaxies: Galaxy[] }) {
                                                                         </label>
                                                                         <input
                                                                             type="date"
-                                                                            value={missionForm.data.deadline}
-                                                                            onChange={(e) =>
+                                                                            value={
+                                                                                missionForm
+                                                                                    .data
+                                                                                    .deadline
+                                                                            }
+                                                                            onChange={(
+                                                                                e,
+                                                                            ) =>
                                                                                 missionForm.setData(
                                                                                     'deadline',
-                                                                                    e.target.value,
+                                                                                    e
+                                                                                        .target
+                                                                                        .value,
                                                                                 )
                                                                             }
                                                                             className="w-full rounded-md border px-3 py-2"
@@ -541,11 +617,19 @@ export default function Dashboard({ galaxies }: { galaxies: Galaxy[] }) {
                                                                         Description
                                                                     </label>
                                                                     <textarea
-                                                                        value={missionForm.data.description}
-                                                                        onChange={(e) =>
+                                                                        value={
+                                                                            missionForm
+                                                                                .data
+                                                                                .description
+                                                                        }
+                                                                        onChange={(
+                                                                            e,
+                                                                        ) =>
                                                                             missionForm.setData(
                                                                                 'description',
-                                                                                e.target.value,
+                                                                                e
+                                                                                    .target
+                                                                                    .value,
                                                                             )
                                                                         }
                                                                         className="w-full rounded-md border px-3 py-2"
@@ -555,7 +639,9 @@ export default function Dashboard({ galaxies }: { galaxies: Galaxy[] }) {
                                                                 <Button
                                                                     type="submit"
                                                                     size="sm"
-                                                                    disabled={missionForm.processing}
+                                                                    disabled={
+                                                                        missionForm.processing
+                                                                    }
                                                                 >
                                                                     Add Mission
                                                                 </Button>
@@ -563,190 +649,303 @@ export default function Dashboard({ galaxies }: { galaxies: Galaxy[] }) {
                                                         </div>
                                                     )}
 
-                                                    {planet.missions.length > 0 && (
+                                                    {planet.missions.length >
+                                                        0 && (
                                                         <div className="border-t p-3">
                                                             <div className="space-y-2">
-                                                                {planet.missions.map((mission) => (
-                                                                    <div
-                                                                        key={mission.id}
-                                                                        className={`rounded border p-2 ${
-                                                                            editingMission?.id === mission.id
-                                                                                ? 'bg-muted'
-                                                                                : ''
-                                                                        }`}
-                                                                    >
-                                                                        {editingMission?.id === mission.id ? (
-                                                                            <form
-                                                                                onSubmit={handleUpdateMission}
-                                                                                className="space-y-2"
-                                                                            >
-                                                                                <input
-                                                                                    type="text"
-                                                                                    value={missionForm.data.title}
-                                                                                    onChange={(e) =>
-                                                                                        missionForm.setData(
-                                                                                            'title',
-                                                                                            e.target.value,
-                                                                                        )
+                                                                {planet.missions.map(
+                                                                    (
+                                                                        mission,
+                                                                    ) => (
+                                                                        <div
+                                                                            key={
+                                                                                mission.id
+                                                                            }
+                                                                            className={`rounded border p-2 ${
+                                                                                editingMission?.id ===
+                                                                                mission.id
+                                                                                    ? 'bg-muted'
+                                                                                    : ''
+                                                                            }`}
+                                                                        >
+                                                                            {editingMission?.id ===
+                                                                            mission.id ? (
+                                                                                <form
+                                                                                    onSubmit={
+                                                                                        handleUpdateMission
                                                                                     }
-                                                                                    className="w-full rounded border px-2 py-1 text-sm"
-                                                                                />
-                                                                                <div className="grid grid-cols-3 gap-2">
-                                                                                    <select
-                                                                                        value={missionForm.data.priority}
-                                                                                        onChange={(e) =>
-                                                                                            missionForm.setData(
-                                                                                                'priority',
-                                                                                                e.target.value as 'low' | 'medium' | 'high' | 'critical',
-                                                                                            )
-                                                                                        }
-                                                                                        className="rounded border px-2 py-1 text-sm"
-                                                                                    >
-                                                                                        <option value="low">Low</option>
-                                                                                        <option value="medium">Medium</option>
-                                                                                        <option value="high">High</option>
-                                                                                        <option value="critical">Critical</option>
-                                                                                    </select>
-                                                                                    <select
-                                                                                        value={missionForm.data.status}
-                                                                                        onChange={(e) =>
-                                                                                            missionForm.setData(
-                                                                                                'status',
-                                                                                                e.target.value as 'pending' | 'in_progress' | 'completed' | 'blocked',
-                                                                                            )
-                                                                                        }
-                                                                                        className="rounded border px-2 py-1 text-sm"
-                                                                                    >
-                                                                                        <option value="pending">Pending</option>
-                                                                                        <option value="in_progress">In Progress</option>
-                                                                                        <option value="completed">Completed</option>
-                                                                                        <option value="blocked">Blocked</option>
-                                                                                    </select>
+                                                                                    className="space-y-2"
+                                                                                >
                                                                                     <input
-                                                                                        type="date"
-                                                                                        value={missionForm.data.deadline}
-                                                                                        onChange={(e) =>
+                                                                                        type="text"
+                                                                                        value={
+                                                                                            missionForm
+                                                                                                .data
+                                                                                                .title
+                                                                                        }
+                                                                                        onChange={(
+                                                                                            e,
+                                                                                        ) =>
                                                                                             missionForm.setData(
-                                                                                                'deadline',
-                                                                                                e.target.value,
+                                                                                                'title',
+                                                                                                e
+                                                                                                    .target
+                                                                                                    .value,
                                                                                             )
                                                                                         }
-                                                                                        className="rounded border px-2 py-1 text-sm"
+                                                                                        className="w-full rounded border px-2 py-1 text-sm"
                                                                                     />
-                                                                                </div>
-                                                                                <textarea
-                                                                                    value={missionForm.data.description}
-                                                                                    onChange={(e) =>
-                                                                                        missionForm.setData(
-                                                                                            'description',
-                                                                                            e.target.value,
-                                                                                        )
-                                                                                    }
-                                                                                    className="w-full rounded border px-2 py-1 text-sm"
-                                                                                    rows={2}
-                                                                                />
-                                                                                <div className="flex gap-2">
-                                                                                    <Button
-                                                                                        type="submit"
-                                                                                        size="sm"
-                                                                                        disabled={missionForm.processing}
-                                                                                    >
-                                                                                        Save
-                                                                                    </Button>
-                                                                                    <Button
-                                                                                        type="button"
-                                                                                        size="sm"
-                                                                                        variant="outline"
-                                                                                        onClick={() => {
-                                                                                            setEditingMission(null);
-                                                                                            missionForm.reset();
-                                                                                        }}
-                                                                                    >
-                                                                                        Cancel
-                                                                                    </Button>
-                                                                                </div>
-                                                                            </form>
-                                                                        ) : (
-                                                                            <div className="flex items-start justify-between gap-2">
-                                                                                <div className="flex-1">
-                                                                                    <div className="flex items-center gap-2">
-                                                                                        <input
-                                                                                            type="checkbox"
-                                                                                            checked={mission.status === 'completed'}
-                                                                                            onChange={() =>
-                                                                                                toggleMissionStatus(mission)
+                                                                                    <div className="grid grid-cols-3 gap-2">
+                                                                                        <select
+                                                                                            value={
+                                                                                                missionForm
+                                                                                                    .data
+                                                                                                    .priority
                                                                                             }
-                                                                                            className="cursor-pointer"
+                                                                                            onChange={(
+                                                                                                e,
+                                                                                            ) =>
+                                                                                                missionForm.setData(
+                                                                                                    'priority',
+                                                                                                    e
+                                                                                                        .target
+                                                                                                        .value as
+                                                                                                        | 'low'
+                                                                                                        | 'medium'
+                                                                                                        | 'high'
+                                                                                                        | 'critical',
+                                                                                                )
+                                                                                            }
+                                                                                            className="rounded border px-2 py-1 text-sm"
+                                                                                        >
+                                                                                            <option value="low">
+                                                                                                Low
+                                                                                            </option>
+                                                                                            <option value="medium">
+                                                                                                Medium
+                                                                                            </option>
+                                                                                            <option value="high">
+                                                                                                High
+                                                                                            </option>
+                                                                                            <option value="critical">
+                                                                                                Critical
+                                                                                            </option>
+                                                                                        </select>
+                                                                                        <select
+                                                                                            value={
+                                                                                                missionForm
+                                                                                                    .data
+                                                                                                    .status
+                                                                                            }
+                                                                                            onChange={(
+                                                                                                e,
+                                                                                            ) =>
+                                                                                                missionForm.setData(
+                                                                                                    'status',
+                                                                                                    e
+                                                                                                        .target
+                                                                                                        .value as
+                                                                                                        | 'pending'
+                                                                                                        | 'in_progress'
+                                                                                                        | 'completed'
+                                                                                                        | 'blocked',
+                                                                                                )
+                                                                                            }
+                                                                                            className="rounded border px-2 py-1 text-sm"
+                                                                                        >
+                                                                                            <option value="pending">
+                                                                                                Pending
+                                                                                            </option>
+                                                                                            <option value="in_progress">
+                                                                                                In
+                                                                                                Progress
+                                                                                            </option>
+                                                                                            <option value="completed">
+                                                                                                Completed
+                                                                                            </option>
+                                                                                            <option value="blocked">
+                                                                                                Blocked
+                                                                                            </option>
+                                                                                        </select>
+                                                                                        <input
+                                                                                            type="date"
+                                                                                            value={
+                                                                                                missionForm
+                                                                                                    .data
+                                                                                                    .deadline
+                                                                                            }
+                                                                                            onChange={(
+                                                                                                e,
+                                                                                            ) =>
+                                                                                                missionForm.setData(
+                                                                                                    'deadline',
+                                                                                                    e
+                                                                                                        .target
+                                                                                                        .value,
+                                                                                                )
+                                                                                            }
+                                                                                            className="rounded border px-2 py-1 text-sm"
                                                                                         />
-                                                                                        <span
-                                                                                            className={`text-sm font-medium ${
-                                                                                                mission.status === 'completed'
-                                                                                                    ? 'line-through text-muted-foreground'
-                                                                                                    : ''
-                                                                                            }`}
-                                                                                        >
-                                                                                            {mission.title}
-                                                                                        </span>
                                                                                     </div>
-                                                                                    <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
-                                                                                        <span
-                                                                                            className={`rounded px-1.5 py-0.5 ${
-                                                                                                mission.priority === 'critical'
-                                                                                                    ? 'bg-red-100 text-red-700'
-                                                                                                    : mission.priority === 'high'
-                                                                                                      ? 'bg-orange-100 text-orange-700'
-                                                                                                      : mission.priority === 'medium'
-                                                                                                        ? 'bg-yellow-100 text-yellow-700'
-                                                                                                        : 'bg-gray-100 text-gray-700'
-                                                                                            }`}
+                                                                                    <textarea
+                                                                                        value={
+                                                                                            missionForm
+                                                                                                .data
+                                                                                                .description
+                                                                                        }
+                                                                                        onChange={(
+                                                                                            e,
+                                                                                        ) =>
+                                                                                            missionForm.setData(
+                                                                                                'description',
+                                                                                                e
+                                                                                                    .target
+                                                                                                    .value,
+                                                                                            )
+                                                                                        }
+                                                                                        className="w-full rounded border px-2 py-1 text-sm"
+                                                                                        rows={
+                                                                                            2
+                                                                                        }
+                                                                                    />
+                                                                                    <div className="flex gap-2">
+                                                                                        <Button
+                                                                                            type="submit"
+                                                                                            size="sm"
+                                                                                            disabled={
+                                                                                                missionForm.processing
+                                                                                            }
                                                                                         >
-                                                                                            {mission.priority}
-                                                                                        </span>
-                                                                                        <span
-                                                                                            className={`rounded px-1.5 py-0.5 ${
-                                                                                                mission.status === 'completed'
-                                                                                                    ? 'bg-green-100 text-green-700'
-                                                                                                    : mission.status === 'in_progress'
-                                                                                                      ? 'bg-blue-100 text-blue-700'
-                                                                                                      : mission.status === 'blocked'
-                                                                                                        ? 'bg-red-100 text-red-700'
-                                                                                                        : 'bg-gray-100 text-gray-700'
-                                                                                            }`}
+                                                                                            Save
+                                                                                        </Button>
+                                                                                        <Button
+                                                                                            type="button"
+                                                                                            size="sm"
+                                                                                            variant="outline"
+                                                                                            onClick={() => {
+                                                                                                setEditingMission(
+                                                                                                    null,
+                                                                                                );
+                                                                                                missionForm.reset();
+                                                                                            }}
                                                                                         >
-                                                                                            {mission.status}
-                                                                                        </span>
-                                                                                        {mission.deadline && (
-                                                                                            <span>
-                                                                                                Due: {new Date(mission.deadline).toLocaleDateString()}
+                                                                                            Cancel
+                                                                                        </Button>
+                                                                                    </div>
+                                                                                </form>
+                                                                            ) : (
+                                                                                <div className="flex items-start justify-between gap-2">
+                                                                                    <div className="flex-1">
+                                                                                        <div className="flex items-center gap-2">
+                                                                                            <input
+                                                                                                type="checkbox"
+                                                                                                checked={
+                                                                                                    mission.status ===
+                                                                                                    'completed'
+                                                                                                }
+                                                                                                onChange={() =>
+                                                                                                    toggleMissionStatus(
+                                                                                                        mission,
+                                                                                                    )
+                                                                                                }
+                                                                                                className="cursor-pointer"
+                                                                                            />
+                                                                                            <span
+                                                                                                className={`text-sm font-medium ${
+                                                                                                    mission.status ===
+                                                                                                    'completed'
+                                                                                                        ? 'text-muted-foreground line-through'
+                                                                                                        : ''
+                                                                                                }`}
+                                                                                            >
+                                                                                                {
+                                                                                                    mission.title
+                                                                                                }
                                                                                             </span>
+                                                                                        </div>
+                                                                                        <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
+                                                                                            <span
+                                                                                                className={`rounded px-1.5 py-0.5 ${
+                                                                                                    mission.priority ===
+                                                                                                    'critical'
+                                                                                                        ? 'bg-red-100 text-red-700'
+                                                                                                        : mission.priority ===
+                                                                                                            'high'
+                                                                                                          ? 'bg-orange-100 text-orange-700'
+                                                                                                          : mission.priority ===
+                                                                                                              'medium'
+                                                                                                            ? 'bg-yellow-100 text-yellow-700'
+                                                                                                            : 'bg-gray-100 text-gray-700'
+                                                                                                }`}
+                                                                                            >
+                                                                                                {
+                                                                                                    mission.priority
+                                                                                                }
+                                                                                            </span>
+                                                                                            <span
+                                                                                                className={`rounded px-1.5 py-0.5 ${
+                                                                                                    mission.status ===
+                                                                                                    'completed'
+                                                                                                        ? 'bg-green-100 text-green-700'
+                                                                                                        : mission.status ===
+                                                                                                            'in_progress'
+                                                                                                          ? 'bg-blue-100 text-blue-700'
+                                                                                                          : mission.status ===
+                                                                                                              'blocked'
+                                                                                                            ? 'bg-red-100 text-red-700'
+                                                                                                            : 'bg-gray-100 text-gray-700'
+                                                                                                }`}
+                                                                                            >
+                                                                                                {
+                                                                                                    mission.status
+                                                                                                }
+                                                                                            </span>
+                                                                                            {mission.deadline && (
+                                                                                                <span>
+                                                                                                    Due:{' '}
+                                                                                                    {new Date(
+                                                                                                        mission.deadline,
+                                                                                                    ).toLocaleDateString()}
+                                                                                                </span>
+                                                                                            )}
+                                                                                        </div>
+                                                                                        {mission.description && (
+                                                                                            <p className="mt-1 text-xs text-muted-foreground">
+                                                                                                {
+                                                                                                    mission.description
+                                                                                                }
+                                                                                            </p>
                                                                                         )}
                                                                                     </div>
-                                                                                    {mission.description && (
-                                                                                        <p className="mt-1 text-xs text-muted-foreground">
-                                                                                            {mission.description}
-                                                                                        </p>
-                                                                                    )}
+                                                                                    <div className="flex gap-1">
+                                                                                        <Button
+                                                                                            size="sm"
+                                                                                            variant="ghost"
+                                                                                            onClick={() =>
+                                                                                                handleEditMission(
+                                                                                                    mission,
+                                                                                                )
+                                                                                            }
+                                                                                        >
+                                                                                            Edit
+                                                                                        </Button>
+                                                                                        <Button
+                                                                                            size="sm"
+                                                                                            variant="ghost"
+                                                                                            onClick={() =>
+                                                                                                handleDeleteMission(
+                                                                                                    mission.id,
+                                                                                                )
+                                                                                            }
+                                                                                        >
+                                                                                            ×
+                                                                                        </Button>
+                                                                                    </div>
                                                                                 </div>
-                                                                                <div className="flex gap-1">
-                                                                                    <Button
-                                                                                        size="sm"
-                                                                                        variant="ghost"
-                                                                                        onClick={() => handleEditMission(mission)}
-                                                                                    >
-                                                                                        Edit
-                                                                                    </Button>
-                                                                                    <Button
-                                                                                        size="sm"
-                                                                                        variant="ghost"
-                                                                                        onClick={() => handleDeleteMission(mission.id)}
-                                                                                    >
-                                                                                        ×
-                                                                                    </Button>
-                                                                                </div>
-                                                                            </div>
-                                                                        )}
-                                                                    </div>
-                                                                ))}
+                                                                            )}
+                                                                        </div>
+                                                                    ),
+                                                                )}
                                                             </div>
                                                         </div>
                                                     )}

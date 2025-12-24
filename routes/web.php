@@ -16,7 +16,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         $galaxies = $user->galaxies()
             ->with(['planets.missions' => function ($query) {
-                $query->orderBy('sort_order')->orderBy('created_at');
+                $query->with('refuels')->orderBy('sort_order')->orderBy('created_at');
             }])
             ->orderBy('sort_order')
             ->get();
@@ -45,6 +45,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('galaxies', \App\Http\Controllers\GalaxyController::class);
     Route::resource('planets', \App\Http\Controllers\PlanetController::class);
     Route::resource('missions', \App\Http\Controllers\MissionController::class);
+    Route::post('missions/{mission}/refuel', [\App\Http\Controllers\MissionController::class, 'refuel'])->name('missions.refuel');
+    Route::delete('missions/{mission}/refuels/{refuel}', [\App\Http\Controllers\MissionController::class, 'deleteRefuel'])->name('missions.refuels.destroy');
 });
 
 require __DIR__.'/settings.php';

@@ -1,7 +1,12 @@
+import type {
+    Galaxy3D,
+    MoonInstance,
+    Planet3D,
+    PlanetInstance,
+} from '@/types/space';
 import * as THREE from 'three';
-import type { Galaxy3D, Planet3D, PlanetInstance, MoonInstance } from '@/types/space';
-import { getPlanetTexture } from './procedural-textures';
 import { calculateGalaxyCenter } from './black-hole-manager';
+import { getPlanetTexture } from './procedural-textures';
 
 /**
  * Get planet radius based on size (reduced to 1/3 of original)
@@ -54,7 +59,7 @@ export function autoPositionPlanets(galaxies: Galaxy3D[]): void {
         const radius = galaxies.length > 1 ? 80 : 0; // Smaller radius, closer to origin
         const centerX = Math.cos(angle) * radius;
         const centerZ = Math.sin(angle) * radius;
-        const centerY = (gIndex % 3 - 1) * 20; // Less vertical variation
+        const centerY = ((gIndex % 3) - 1) * 20; // Less vertical variation
 
         // Distribute planets within galaxy using fibonacci sphere
         const galaxyRadius = 40; // Smaller cluster radius
@@ -71,7 +76,9 @@ export function autoPositionPlanets(galaxies: Galaxy3D[]): void {
             }
 
             // Fibonacci sphere algorithm
-            const phi = Math.acos(1 - (2 * (pIndex + 0.5)) / galaxy.planets.length);
+            const phi = Math.acos(
+                1 - (2 * (pIndex + 0.5)) / galaxy.planets.length,
+            );
             const theta = Math.PI * (1 + Math.sqrt(5)) * pIndex;
 
             planet.position_x =
@@ -115,18 +122,20 @@ function getOrbitalSpeed(size: string, distance: number): number {
 function createOrbitLine(
     center: THREE.Vector3,
     distance: number,
-    color: string
+    color: string,
 ): THREE.Line {
     const points: THREE.Vector3[] = [];
     const segments = 128;
 
     for (let i = 0; i <= segments; i++) {
         const angle = (i / segments) * Math.PI * 2;
-        points.push(new THREE.Vector3(
-            center.x + distance * Math.cos(angle),
-            center.y,
-            center.z + distance * Math.sin(angle)
-        ));
+        points.push(
+            new THREE.Vector3(
+                center.x + distance * Math.cos(angle),
+                center.y,
+                center.z + distance * Math.sin(angle),
+            ),
+        );
     }
 
     const geometry = new THREE.BufferGeometry().setFromPoints(points);
@@ -147,7 +156,10 @@ function createOrbitLine(
 /**
  * Create a text sprite label
  */
-function createTextSprite(text: string, color: string = '#ffffff'): THREE.Sprite {
+function createTextSprite(
+    text: string,
+    color: string = '#ffffff',
+): THREE.Sprite {
     const canvas = document.createElement('canvas');
     const context = canvas.getContext('2d')!;
 
@@ -166,7 +178,10 @@ function createTextSprite(text: string, color: string = '#ffffff'): THREE.Sprite
 
     // Create sprite
     const texture = new THREE.CanvasTexture(canvas);
-    const material = new THREE.SpriteMaterial({ map: texture, transparent: true });
+    const material = new THREE.SpriteMaterial({
+        map: texture,
+        transparent: true,
+    });
     const sprite = new THREE.Sprite(material);
 
     // Scale sprite (adjust as needed)
@@ -180,7 +195,7 @@ function createTextSprite(text: string, color: string = '#ffffff'): THREE.Sprite
  */
 export function createPlanet(
     planet: Planet3D,
-    galaxyColor: string
+    galaxyColor: string,
 ): THREE.Mesh {
     const radius = getPlanetRadius(planet.size);
     const geometry = new THREE.SphereGeometry(radius, 64, 64); // Higher quality for texture detail
@@ -208,7 +223,7 @@ export function createPlanet(
     mesh.position.set(
         planet.position_x || 0,
         planet.position_y || 0,
-        planet.position_z || 0
+        planet.position_z || 0,
     );
 
     // Add text label above planet
@@ -243,9 +258,11 @@ function createMoons(planetId: number, planetRadius: number): MoonInstance[] {
         const moonGeometry = new THREE.SphereGeometry(moonRadius, 16, 16);
 
         // Random gray color for moon
-        const grayValue = Math.floor(120 + random(planetId * 67.890 + i) * 80);
+        const grayValue = Math.floor(120 + random(planetId * 67.89 + i) * 80);
         const moonMaterial = new THREE.MeshStandardMaterial({
-            color: new THREE.Color(`rgb(${grayValue}, ${grayValue}, ${grayValue})`),
+            color: new THREE.Color(
+                `rgb(${grayValue}, ${grayValue}, ${grayValue})`,
+            ),
             roughness: 0.9,
             metalness: 0.1,
         });
@@ -271,10 +288,7 @@ function createMoons(planetId: number, planetRadius: number): MoonInstance[] {
 /**
  * Add visual effects based on planet health status
  */
-export function addPlanetEffects(
-    mesh: THREE.Mesh,
-    planet: Planet3D
-): void {
+export function addPlanetEffects(mesh: THREE.Mesh, planet: Planet3D): void {
     const radius = getPlanetRadius(planet.size);
 
     // Add glow effect based on health status
@@ -300,7 +314,7 @@ export function addPlanetEffects(
 
         particles.setAttribute(
             'position',
-            new THREE.BufferAttribute(positions, 3)
+            new THREE.BufferAttribute(positions, 3),
         );
 
         const particleMaterial = new THREE.PointsMaterial({
@@ -319,7 +333,7 @@ export function addPlanetEffects(
         const ringGeometry = new THREE.RingGeometry(
             radius * 1.3,
             radius * 1.5,
-            64
+            64,
         );
         const ringMaterial = new THREE.MeshBasicMaterial({
             color: 0x00ff00,
@@ -342,7 +356,7 @@ export class PlanetManager {
 
     constructor(
         private scene: THREE.Scene,
-        private galaxies: Galaxy3D[]
+        private galaxies: Galaxy3D[],
     ) {}
 
     /**
@@ -372,15 +386,15 @@ export class PlanetManager {
                 const planetPos = new THREE.Vector3(
                     planet.position_x || 0,
                     planet.position_y || 0,
-                    planet.position_z || 0
+                    planet.position_z || 0,
                 );
                 const orbitDistance = Math.sqrt(
                     Math.pow(planetPos.x - galaxyCenter.x, 2) +
-                    Math.pow(planetPos.z - galaxyCenter.z, 2)
+                        Math.pow(planetPos.z - galaxyCenter.z, 2),
                 );
                 const orbitAngle = Math.atan2(
                     planetPos.z - galaxyCenter.z,
-                    planetPos.x - galaxyCenter.x
+                    planetPos.x - galaxyCenter.x,
                 );
                 const orbitSpeed = getOrbitalSpeed(planet.size, orbitDistance);
 
@@ -388,20 +402,20 @@ export class PlanetManager {
                 const orbitLine = createOrbitLine(
                     galaxyCenter,
                     orbitDistance,
-                    planet.color || galaxy.color
+                    planet.color || galaxy.color,
                 );
                 this.scene.add(orbitLine);
 
                 // Create and add moons
                 const radius = getPlanetRadius(planet.size);
                 const moons = createMoons(planet.id, radius);
-                moons.forEach(moon => {
+                moons.forEach((moon) => {
                     mesh.add(moon.mesh); // Add moon to planet (so it moves with planet)
                     // Position moon in orbit
                     moon.mesh.position.set(
                         moon.orbitDistance * Math.cos(moon.orbitAngle),
                         0,
-                        moon.orbitDistance * Math.sin(moon.orbitAngle)
+                        moon.orbitDistance * Math.sin(moon.orbitAngle),
                     );
                 });
 
@@ -440,15 +454,21 @@ export class PlanetManager {
     update(deltaTime: number): void {
         this.planets.forEach((instance) => {
             // Get galaxy center for this planet
-            const galaxyCenter = this.galaxyCenters.get(instance.planet.galaxy_id);
+            const galaxyCenter = this.galaxyCenters.get(
+                instance.planet.galaxy_id,
+            );
             if (!galaxyCenter) return;
 
             // Update orbital position
             instance.orbitAngle += instance.orbitSpeed * deltaTime;
 
             // Calculate new position in orbit (circular orbit in XZ plane)
-            const newX = galaxyCenter.x + instance.orbitDistance * Math.cos(instance.orbitAngle);
-            const newZ = galaxyCenter.z + instance.orbitDistance * Math.sin(instance.orbitAngle);
+            const newX =
+                galaxyCenter.x +
+                instance.orbitDistance * Math.cos(instance.orbitAngle);
+            const newZ =
+                galaxyCenter.z +
+                instance.orbitDistance * Math.sin(instance.orbitAngle);
             const newY = galaxyCenter.y; // Keep Y at galaxy center level
 
             instance.mesh.position.set(newX, newY, newZ);
@@ -463,7 +483,7 @@ export class PlanetManager {
 
             // Update moon orbits
             if (instance.moons) {
-                instance.moons.forEach(moon => {
+                instance.moons.forEach((moon) => {
                     // Update moon orbital angle
                     moon.orbitAngle += moon.orbitSpeed * deltaTime;
 
@@ -471,7 +491,7 @@ export class PlanetManager {
                     moon.mesh.position.set(
                         moon.orbitDistance * Math.cos(moon.orbitAngle),
                         0,
-                        moon.orbitDistance * Math.sin(moon.orbitAngle)
+                        moon.orbitDistance * Math.sin(moon.orbitAngle),
                     );
                 });
             }
@@ -479,9 +499,14 @@ export class PlanetManager {
             // Pulse effect for critical planets
             if (instance.planet.health_status === 'critical') {
                 const glow = instance.mesh.children.find(
-                    (child) => child instanceof THREE.Mesh && child !== instance.mesh
+                    (child) =>
+                        child instanceof THREE.Mesh && child !== instance.mesh,
                 );
-                if (glow && glow instanceof THREE.Mesh && glow.material instanceof THREE.MeshBasicMaterial) {
+                if (
+                    glow &&
+                    glow instanceof THREE.Mesh &&
+                    glow.material instanceof THREE.MeshBasicMaterial
+                ) {
                     const pulse = Math.sin(Date.now() * 0.003) * 0.2 + 0.3;
                     glow.material.opacity = pulse;
                 }

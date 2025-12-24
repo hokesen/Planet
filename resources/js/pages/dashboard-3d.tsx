@@ -1,16 +1,17 @@
-import { useState } from 'react';
-import { Head } from '@inertiajs/react';
-import AppLayout from '@/layouts/app-layout';
-import { SpaceVisualization } from '@/components/space-visualization';
-import MissionModal from '@/components/mission-modal';
-import PlanetModal from '@/components/planet-modal';
 import GalaxyModal from '@/components/galaxy-modal';
-import WormholeModal from '@/components/wormhole-modal';
+import MissionModal from '@/components/mission-modal';
+import { router } from '@inertiajs/react';
+import PlanetModal from '@/components/planet-modal';
+import { SpaceVisualization } from '@/components/space-visualization';
 import { Button } from '@/components/ui/button';
-import type { BreadcrumbItem } from '@/types';
-import type { Galaxy3D, Planet3D, Mission3D } from '@/types/space';
+import WormholeModal from '@/components/wormhole-modal';
+import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
-import { Plus, Rocket, Globe, Sparkles } from 'lucide-react';
+import type { BreadcrumbItem } from '@/types';
+import type { Galaxy3D, Mission3D, Planet3D } from '@/types/space';
+import { Head } from '@inertiajs/react';
+import { Globe, Plus, Rocket, Sparkles } from 'lucide-react';
+import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -48,14 +49,10 @@ interface Dashboard3DProps {
 
 export default function Dashboard3D({ galaxies, capacity }: Dashboard3DProps) {
     const [selectedMission, setSelectedMission] = useState<Mission3D | null>(
-        null
+        null,
     );
-    const [selectedPlanet, setSelectedPlanet] = useState<Planet3D | null>(
-        null
-    );
-    const [selectedGalaxy, setSelectedGalaxy] = useState<Galaxy3D | null>(
-        null
-    );
+    const [selectedPlanet, setSelectedPlanet] = useState<Planet3D | null>(null);
+    const [selectedGalaxy, setSelectedGalaxy] = useState<Galaxy3D | null>(null);
     const [showMissionModal, setShowMissionModal] = useState(false);
     const [showPlanetModal, setShowPlanetModal] = useState(false);
     const [showGalaxyModal, setShowGalaxyModal] = useState(false);
@@ -79,6 +76,32 @@ export default function Dashboard3D({ galaxies, capacity }: Dashboard3DProps) {
 
     const handleWormholeClick = () => {
         setShowWormholeModal(true);
+    };
+
+    const handleRefuel = (missionId: number, e: React.MouseEvent) => {
+        e.stopPropagation();
+        router.post(`/missions/${missionId}/refuel`, {}, {
+            preserveScroll: true,
+        });
+    };
+
+    const formatFuelRemaining = (seconds: number | null): string => {
+        if (seconds === null || seconds === 0) {
+            return 'Empty';
+        }
+
+        const days = Math.floor(seconds / (24 * 60 * 60));
+        const hours = Math.floor((seconds % (24 * 60 * 60)) / (60 * 60));
+        const minutes = Math.floor((seconds % (60 * 60)) / 60);
+        const secs = Math.floor(seconds % 60);
+
+        const parts: string[] = [];
+        if (days > 0) parts.push(`${days}d`);
+        if (hours > 0) parts.push(`${hours}h`);
+        if (minutes > 0) parts.push(`${minutes}m`);
+        if (secs > 0 || parts.length === 0) parts.push(`${secs}s`);
+
+        return parts.join(' ');
     };
 
     const handleCloseMissionModal = () => {
@@ -124,10 +147,8 @@ export default function Dashboard3D({ galaxies, capacity }: Dashboard3DProps) {
                 />
 
                 {/* Mission Control - Active Rockets Panel - top left */}
-                <div className="absolute left-4 top-4 max-h-[80vh] w-80 overflow-y-auto rounded-lg bg-black/70 p-4 text-white backdrop-blur-lg">
-                    <h2 className="mb-3 text-lg font-bold">
-                        Mission Control
-                    </h2>
+                <div className="absolute top-4 left-4 max-h-[80vh] w-80 overflow-y-auto rounded-lg bg-black/70 p-4 text-white backdrop-blur-lg">
+                    <h2 className="mb-3 text-lg font-bold">Mission Control</h2>
 
                     {(() => {
                         // Collect all active rockets
@@ -143,11 +164,18 @@ export default function Dashboard3D({ galaxies, capacity }: Dashboard3DProps) {
                                     planet.missions.forEach((mission) => {
                                         if (
                                             mission.status !== 'completed' &&
-                                            (mission.commitment_type === 'daily' ||
-                                             mission.commitment_type === 'weekly' ||
-                                             mission.commitment_type === 'monthly')
+                                            (mission.commitment_type ===
+                                                'daily' ||
+                                                mission.commitment_type ===
+                                                    'weekly' ||
+                                                mission.commitment_type ===
+                                                    'monthly')
                                         ) {
-                                            activeRockets.push({ mission, planet, galaxy });
+                                            activeRockets.push({
+                                                mission,
+                                                planet,
+                                                galaxy,
+                                            });
                                         }
                                     });
                                 }
@@ -164,74 +192,179 @@ export default function Dashboard3D({ galaxies, capacity }: Dashboard3DProps) {
 
                         return (
                             <div className="space-y-2">
-                                {activeRockets.map(({ mission, planet, galaxy }) => {
-                                    // Calculate fuel remaining (time until next occurrence)
-                                    const now = new Date();
-                                    const getNextOccurrence = () => {
-                                        const today = new Date(now);
-                                        today.setHours(0, 0, 0, 0);
+                                {activeRockets.map(
+                                    ({ mission, planet, galaxy }) => {
+                                        // Get fuel status from backend
+                                        const fuelStatus = mission.fuel_status;
+                                        const fuelRemainingSeconds = fuelStatus?.fuel_remaining_seconds ?? null;
+                                        const needsRefuel = fuelStatus?.needs_refuel ?? false;
+                                        const priorityColors: Record<
+                                            string,
+                                            string
+                                        > = {
+                                            critical: 'text-red-400',
+                                            high: 'text-orange-400',
+                                            medium: 'text-yellow-400',
+                                            low: 'text-blue-400',
+                                        };
 
-                                        if (mission.commitment_type === 'daily') {
-                                            const tomorrow = new Date(today);
-                                            tomorrow.setDate(tomorrow.getDate() + 1);
-                                            return tomorrow;
-                                        } else if (mission.commitment_type === 'weekly') {
-                                            const nextWeek = new Date(today);
-                                            nextWeek.setDate(nextWeek.getDate() + 7);
-                                            return nextWeek;
-                                        } else if (mission.commitment_type === 'monthly') {
-                                            const nextMonth = new Date(today);
-                                            nextMonth.setMonth(nextMonth.getMonth() + 1);
-                                            return nextMonth;
+                                        // Get route planets if mission has a multi-planet route
+                                        const routePlanets: Array<{
+                                            planet: Planet3D;
+                                            galaxy: Galaxy3D;
+                                        }> = [];
+                                        if (
+                                            mission.planet_route &&
+                                            mission.planet_route.length > 0
+                                        ) {
+                                            mission.planet_route.forEach(
+                                                (planetId) => {
+                                                    galaxies.forEach((g) => {
+                                                        const p =
+                                                            g.planets.find(
+                                                                (pl) =>
+                                                                    pl.id ===
+                                                                    planetId,
+                                                            );
+                                                        if (p) {
+                                                            routePlanets.push({
+                                                                planet: p,
+                                                                galaxy: g,
+                                                            });
+                                                        }
+                                                    });
+                                                },
+                                            );
                                         }
-                                        return null;
-                                    };
 
-                                    const nextOccurrence = getNextOccurrence();
-                                    const fuelRemaining = nextOccurrence
-                                        ? Math.max(0, Math.floor((nextOccurrence.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)))
-                                        : 0;
-                                    const priorityColors: Record<string, string> = {
-                                        critical: 'text-red-400',
-                                        high: 'text-orange-400',
-                                        medium: 'text-yellow-400',
-                                        low: 'text-blue-400',
-                                    };
+                                        // Group planets by galaxy for display
+                                        const galaxyGroups = new Map<
+                                            number,
+                                            {
+                                                galaxy: Galaxy3D;
+                                                planets: Planet3D[];
+                                            }
+                                        >();
 
-                                    return (
-                                        <div
-                                            key={mission.id}
-                                            className="cursor-pointer rounded border border-gray-600 bg-gray-900/50 p-2 text-xs transition-colors hover:bg-gray-800/50"
-                                            onClick={() => handleRocketClick(mission)}
-                                        >
-                                            <div className="flex items-start justify-between gap-2">
-                                                <div className="flex-1">
-                                                    <div className={`font-semibold ${priorityColors[mission.priority]}`}>
-                                                        {mission.title}
+                                        if (routePlanets.length > 0) {
+                                            routePlanets.forEach(
+                                                ({ planet: p, galaxy: g }) => {
+                                                    if (
+                                                        !galaxyGroups.has(g.id)
+                                                    ) {
+                                                        galaxyGroups.set(g.id, {
+                                                            galaxy: g,
+                                                            planets: [],
+                                                        });
+                                                    }
+                                                    galaxyGroups
+                                                        .get(g.id)!
+                                                        .planets.push(p);
+                                                },
+                                            );
+                                        } else {
+                                            // Single planet route
+                                            galaxyGroups.set(galaxy.id, {
+                                                galaxy,
+                                                planets: [planet],
+                                            });
+                                        }
+
+                                        return (
+                                            <div
+                                                key={mission.id}
+                                                className="cursor-pointer rounded border border-gray-600 bg-gray-900/50 p-2 text-xs transition-colors hover:bg-gray-800/50"
+                                                onClick={() =>
+                                                    handleRocketClick(mission)
+                                                }
+                                            >
+                                                <div className="flex items-start justify-between gap-2">
+                                                    <div className="flex-1">
+                                                        <div
+                                                            className={`font-semibold ${priorityColors[mission.priority]}`}
+                                                        >
+                                                            {mission.title}
+                                                        </div>
+                                                        <div className="mt-1 space-y-0.5 text-gray-400">
+                                                            {Array.from(
+                                                                galaxyGroups.values(),
+                                                            ).map(
+                                                                (
+                                                                    {
+                                                                        galaxy: g,
+                                                                        planets:
+                                                                            pls,
+                                                                    },
+                                                                    idx,
+                                                                ) => (
+                                                                    <div
+                                                                        key={
+                                                                            g.id
+                                                                        }
+                                                                    >
+                                                                        <div>
+                                                                            {
+                                                                                g.icon
+                                                                            }{' '}
+                                                                            {
+                                                                                g.name
+                                                                            }
+                                                                        </div>
+                                                                        <div className="ml-3">
+                                                                            →{' '}
+                                                                            {pls.map(
+                                                                                (
+                                                                                    p,
+                                                                                    i,
+                                                                                ) => (
+                                                                                    <span
+                                                                                        key={
+                                                                                            p.id
+                                                                                        }
+                                                                                    >
+                                                                                        {
+                                                                                            p.name
+                                                                                        }
+                                                                                        {i <
+                                                                                            pls.length -
+                                                                                                1 &&
+                                                                                            ' → '}
+                                                                                    </span>
+                                                                                ),
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+                                                                ),
+                                                            )}
+                                                        </div>
+                                                        <div className="mt-1 flex items-center gap-2 text-gray-500">
+                                                            <span className="capitalize">
+                                                                {
+                                                                    mission.commitment_type
+                                                                }
+                                                            </span>
+                                                            <span>•</span>
+                                                            <span className={needsRefuel ? 'text-red-400 font-semibold' : ''}>
+                                                                Fuel:{' '}
+                                                                {formatFuelRemaining(fuelRemainingSeconds)}
+                                                            </span>
+                                                        </div>
                                                     </div>
-                                                    <div className="text-gray-400">
-                                                        {galaxy.icon} {galaxy.name} → {planet.name}
-                                                    </div>
-                                                    <div className="mt-1 flex items-center gap-2 text-gray-500">
-                                                        <span className="capitalize">{mission.commitment_type}</span>
-                                                        <span>•</span>
-                                                        <span>Fuel: {fuelRemaining}d remaining</span>
-                                                    </div>
+                                                    <button
+                                                        onClick={(e) => handleRefuel(mission.id, e)}
+                                                        className={`rounded px-2 py-1 text-[10px] font-semibold transition-colors ${
+                                                            needsRefuel
+                                                                ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30 animate-pulse'
+                                                                : 'bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30'
+                                                        }`}
+                                                    >
+                                                        Refuel
+                                                    </button>
                                                 </div>
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        // TODO: Implement refuel functionality
-                                                        alert('Refuel feature coming soon!');
-                                                    }}
-                                                    className="rounded bg-cyan-500/20 px-2 py-1 text-[10px] font-semibold text-cyan-400 hover:bg-cyan-500/30"
-                                                >
-                                                    Refuel
-                                                </button>
                                             </div>
-                                        </div>
-                                    );
-                                })}
+                                        );
+                                    },
+                                )}
                             </div>
                         );
                     })()}
@@ -291,7 +424,7 @@ export default function Dashboard3D({ galaxies, capacity }: Dashboard3DProps) {
                             Planets:{' '}
                             {galaxies.reduce(
                                 (sum, g) => sum + g.planets.length,
-                                0
+                                0,
                             )}
                         </div>
                     </div>

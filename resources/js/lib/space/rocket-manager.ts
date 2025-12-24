@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import type { Mission3D, Planet3D, RocketInstance } from '@/types/space';
-import { getPlanetRadius } from './planet-manager';
 
 /**
  * Get rocket speed based on commitment type
@@ -37,6 +36,7 @@ export function getPriorityColor(priority: string): number {
  */
 export function createRocket(mission: Mission3D): THREE.Group {
     const rocket = new THREE.Group();
+    const rocketMesh = new THREE.Group(); // Inner group for the actual rocket geometry
 
     // Main body (cylinder)
     const bodyGeometry = new THREE.CylinderGeometry(0.3, 0.3, 2, 8);
@@ -46,7 +46,7 @@ export function createRocket(mission: Mission3D): THREE.Group {
         roughness: 0.2,
     });
     const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
-    rocket.add(body);
+    rocketMesh.add(body);
 
     // Nose cone
     const noseGeometry = new THREE.ConeGeometry(0.3, 1, 8);
@@ -59,7 +59,7 @@ export function createRocket(mission: Mission3D): THREE.Group {
     });
     const nose = new THREE.Mesh(noseGeometry, noseMaterial);
     nose.position.y = 1.5;
-    rocket.add(nose);
+    rocketMesh.add(nose);
 
     // Fins (4 small triangles)
     const finGeometry = new THREE.ConeGeometry(0.2, 0.5, 3);
@@ -76,7 +76,7 @@ export function createRocket(mission: Mission3D): THREE.Group {
         fin.rotation.y = (Math.PI / 2) * i;
         fin.position.x = Math.cos((Math.PI / 2) * i) * 0.4;
         fin.position.z = Math.sin((Math.PI / 2) * i) * 0.4;
-        rocket.add(fin);
+        rocketMesh.add(fin);
     }
 
     // Engine glow (sprite)
@@ -90,7 +90,13 @@ export function createRocket(mission: Mission3D): THREE.Group {
     const glow = new THREE.Sprite(glowMaterial);
     glow.scale.set(1, 1, 1);
     glow.position.y = -1.5;
-    rocket.add(glow);
+    rocketMesh.add(glow);
+
+    // Rotate the rocket mesh so it points forward (Z-axis) instead of up (Y-axis)
+    // This makes lookAt work correctly
+    rocketMesh.rotation.x = Math.PI / 2;
+
+    rocket.add(rocketMesh);
 
     // Store mission data for interaction
     rocket.userData = {
@@ -123,23 +129,60 @@ function createGlowTexture(): THREE.CanvasTexture {
 }
 
 /**
- * Create a trail line for a rocket
+ * Create an ionic trail with particles for a rocket
  */
-function createTrail(color: number): THREE.Line {
-    const trailLength = 20;
+function createTrail(color: number): THREE.Points {
+    const trailLength = 60; // More particles for smoother, more dynamic trail
     const positions = new Float32Array(trailLength * 3);
+    const sizes = new Float32Array(trailLength);
+    const colors = new Float32Array(trailLength * 3);
+
+    // Initialize sizes and colors (fade out towards the end)
+    const baseColor = new THREE.Color(color);
+    for (let i = 0; i < trailLength; i++) {
+        const fade = 1 - i / trailLength;
+        sizes[i] = fade * 3; // Larger particles at front
+
+        // Brighter colors at front, fade to darker at back
+        colors[i * 3] = baseColor.r * (0.5 + fade * 0.5);
+        colors[i * 3 + 1] = baseColor.g * (0.5 + fade * 0.5);
+        colors[i * 3 + 2] = baseColor.b * (0.5 + fade * 0.5);
+    }
 
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
-    const material = new THREE.LineBasicMaterial({
-        color: color,
+    // Create a more vibrant glowing particle texture
+    const canvas = document.createElement('canvas');
+    canvas.width = 64;
+    canvas.height = 64;
+    const ctx = canvas.getContext('2d')!;
+
+    // Multi-layer glow for more vibrant effect
+    const gradient1 = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+    gradient1.addColorStop(0, 'rgba(255, 255, 255, 1)');
+    gradient1.addColorStop(0.2, 'rgba(255, 255, 255, 0.9)');
+    gradient1.addColorStop(0.5, 'rgba(200, 220, 255, 0.6)');
+    gradient1.addColorStop(1, 'rgba(100, 150, 255, 0)');
+    ctx.fillStyle = gradient1;
+    ctx.fillRect(0, 0, 64, 64);
+
+    const texture = new THREE.CanvasTexture(canvas);
+
+    const material = new THREE.PointsMaterial({
+        size: 3,
+        map: texture,
         transparent: true,
-        opacity: 0.6,
-        linewidth: 2,
+        opacity: 0.95,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        sizeAttenuation: true,
+        vertexColors: true, // Use per-particle colors
     });
 
-    const trail = new THREE.Line(geometry, material);
+    const trail = new THREE.Points(geometry, material);
     return trail;
 }
 
@@ -292,26 +335,36 @@ export class RocketManager {
             targetPos.lerpVectors(homePos, planetPos, lookAheadProgress);
             rocket.mesh.lookAt(targetPos);
 
-            // Pulse the engine glow
-            const glow = rocket.mesh.children.find(
-                (child) => child instanceof THREE.Sprite
-            ) as THREE.Sprite | undefined;
+            // Pulse the engine glow - need to search in nested group
+            const rocketMesh = rocket.mesh.children[0]; // First child is the rocketMesh group
+            if (rocketMesh) {
+                const glow = rocketMesh.children.find(
+                    (child) => child instanceof THREE.Sprite
+                ) as THREE.Sprite | undefined;
 
-            if (glow && glow.material instanceof THREE.SpriteMaterial) {
-                const pulse = Math.sin(Date.now() * 0.01) * 0.3 + 0.7;
-                glow.material.opacity = pulse;
+                if (glow && glow.material instanceof THREE.SpriteMaterial) {
+                    const pulse = Math.sin(Date.now() * 0.015) * 0.4 + 0.6; // Faster pulse
+                    glow.material.opacity = pulse;
+                }
             }
 
-            // Update trail
+            // Update ionic trail with dynamic effects
             if (rocket.trail && rocket.trailPositions) {
-                const maxTrailLength = 20;
+                const maxTrailLength = 60;
 
-                // Add current position to trail
+                // Add current position with slight random offset for spread effect
+                const spreadAmount = 0.3;
+                const randomOffset = new THREE.Vector3(
+                    (Math.random() - 0.5) * spreadAmount,
+                    (Math.random() - 0.5) * spreadAmount,
+                    (Math.random() - 0.5) * spreadAmount
+                );
+
                 rocket.trailPositions.unshift(
                     new THREE.Vector3(
-                        rocket.mesh.position.x,
-                        rocket.mesh.position.y,
-                        rocket.mesh.position.z
+                        rocket.mesh.position.x + randomOffset.x,
+                        rocket.mesh.position.y + randomOffset.y,
+                        rocket.mesh.position.z + randomOffset.z
                     )
                 );
 
@@ -320,24 +373,45 @@ export class RocketManager {
                     rocket.trailPositions.pop();
                 }
 
-                // Update trail geometry
+                // Update trail geometry with dynamic effects
                 const positions = rocket.trail.geometry.getAttribute('position');
+                const sizes = rocket.trail.geometry.getAttribute('size');
+                const colors = rocket.trail.geometry.getAttribute('color');
+
+                const baseColor = new THREE.Color(getPriorityColor(rocket.mission.priority));
+                const time = Date.now() * 0.001;
+
                 for (let i = 0; i < maxTrailLength; i++) {
                     if (i < rocket.trailPositions.length) {
                         const pos = rocket.trailPositions[i];
                         positions.setXYZ(i, pos.x, pos.y, pos.z);
+
+                        // Dynamic size with faster, more dramatic pulse
+                        const baseFade = (1 - i / maxTrailLength);
+                        const pulse = Math.sin(time * 3 + i * 0.2) * 0.4 + 0.6;
+                        sizes.setX(i, baseFade * 3 * pulse);
+
+                        // Animated color intensity
+                        const colorPulse = Math.sin(time * 2 + i * 0.15) * 0.3 + 0.7;
+                        colors.setXYZ(
+                            i,
+                            baseColor.r * (0.5 + baseFade * 0.5) * colorPulse,
+                            baseColor.g * (0.5 + baseFade * 0.5) * colorPulse,
+                            baseColor.b * (0.5 + baseFade * 0.5) * colorPulse
+                        );
                     } else {
-                        // Fill remaining with last position to avoid stretching
-                        const lastPos =
-                            rocket.trailPositions[
-                                rocket.trailPositions.length - 1
-                            ];
+                        // Fill remaining with last position
+                        const lastPos = rocket.trailPositions[rocket.trailPositions.length - 1];
                         if (lastPos) {
                             positions.setXYZ(i, lastPos.x, lastPos.y, lastPos.z);
+                            sizes.setX(i, 0);
+                            colors.setXYZ(i, 0, 0, 0);
                         }
                     }
                 }
                 positions.needsUpdate = true;
+                sizes.needsUpdate = true;
+                colors.needsUpdate = true;
             }
         });
     }

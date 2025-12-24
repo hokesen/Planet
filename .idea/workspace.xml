@@ -4,16 +4,20 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="260f6228-9afc-4530-8118-cc221fcfaacc" name="Changes" comment="planet simulation">
+    <list default="true" id="260f6228-9afc-4530-8118-cc221fcfaacc" name="Changes" comment="Black holes &amp; wormhole">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/galaxy-modal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/galaxy-modal.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/mission-modal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/mission-modal.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/planet-modal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/planet-modal.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/components/space-visualization.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/space-visualization.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/wormhole-modal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/wormhole-modal.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/lib/space/interaction-handler.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/lib/space/interaction-handler.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/lib/space/planet-manager.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/lib/space/planet-manager.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/lib/space/procedural-textures.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/lib/space/procedural-textures.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/lib/space/rocket-manager.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/lib/space/rocket-manager.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/lib/space/scene-setup.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/lib/space/scene-setup.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/pages/dashboard-3d.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/dashboard-3d.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/pages/welcome.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/welcome.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/pages/dashboard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/pages/dashboard.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/js/types/space.ts" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/types/space.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -27,7 +31,7 @@
     </execution>
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="6" />
+    <option name="cachedIndexableFilesCount" value="9371" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="Git.Settings">
@@ -125,7 +129,7 @@
       <updated>1766441299164</updated>
       <workItem from="1766441300875" duration="42000" />
       <workItem from="1766441376533" duration="96000" />
-      <workItem from="1766441537817" duration="7605000" />
+      <workItem from="1766441537817" duration="12320000" />
     </task>
     <task id="LOCAL-00001" summary="Install Laravel React Template">
       <option name="closed" value="true" />
@@ -167,7 +171,15 @@
       <option name="project" value="LOCAL" />
       <updated>1766455506702</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Black holes &amp; wormhole">
+      <option name="closed" value="true" />
+      <created>1766458001779</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1766458001779</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -179,7 +191,8 @@
     <MESSAGE value="Update CLAUDE.md" />
     <MESSAGE value="Revamp welcome page with three planet animation" />
     <MESSAGE value="planet simulation" />
-    <option name="LAST_COMMIT_MESSAGE" value="planet simulation" />
+    <MESSAGE value="Black holes &amp; wormhole" />
+    <option name="LAST_COMMIT_MESSAGE" value="Black holes &amp; wormhole" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

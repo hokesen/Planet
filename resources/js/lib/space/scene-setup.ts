@@ -107,28 +107,28 @@ export function addStarfield(scene: THREE.Scene): void {
 }
 
 /**
- * Create text sprite label for wormhole
+ * Create text sprite label for wormhole - currently unused
  */
-function createWormholeLabel(): THREE.Sprite {
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d')!;
+// function createWormholeLabel(): THREE.Sprite {
+//     const canvas = document.createElement('canvas');
+//     const context = canvas.getContext('2d')!;
 
-    canvas.width = 512;
-    canvas.height = 128;
+//     canvas.width = 512;
+//     canvas.height = 128;
 
-    context.font = 'Bold 48px Arial';
-    context.fillStyle = '#ffffff';
-    context.textAlign = 'center';
-    context.textBaseline = 'middle';
-    context.fillText('Refueling Wormhole', canvas.width / 2, canvas.height / 2);
+//     context.font = 'Bold 48px Arial';
+//     context.fillStyle = '#ffffff';
+//     context.textAlign = 'center';
+//     context.textBaseline = 'middle';
+//     context.fillText('Refueling Wormhole', canvas.width / 2, canvas.height / 2);
 
-    const texture = new THREE.CanvasTexture(canvas);
-    const material = new THREE.SpriteMaterial({ map: texture, transparent: true });
-    const sprite = new THREE.Sprite(material);
-    sprite.scale.set(40, 10, 1);
+//     const texture = new THREE.CanvasTexture(canvas);
+//     const material = new THREE.SpriteMaterial({ map: texture, transparent: true });
+//     const sprite = new THREE.Sprite(material);
+//     sprite.scale.set(20, 5, 1); // Match planet label size
 
-    return sprite;
-}
+//     return sprite;
+// }
 
 /**
  * Add wormhole (refueling station) at origin
@@ -171,26 +171,15 @@ export function addHomeBase(scene: THREE.Scene): THREE.Group {
         rings.push(ring);
     }
 
-    // Add glow effect around wormhole
-    const glowGeometry = new THREE.SphereGeometry(20, 32, 32);
-    const glowMaterial = new THREE.MeshBasicMaterial({
-        color: 0x4400FF,
-        transparent: true,
-        opacity: 0.15,
-    });
-    const glowMesh = new THREE.Mesh(glowGeometry, glowMaterial);
-    wormholeGroup.add(glowMesh);
-
-    // Add "Refueling Wormhole" label above
-    const label = createWormholeLabel();
-    label.position.y = 25;
-    wormholeGroup.add(label);
+    // Add "Refueling Wormhole" label - currently disabled
+    // const label = createWormholeLabel();
+    // label.position.y = 25;
+    // wormholeGroup.add(label);
 
     scene.add(wormholeGroup);
 
     // Store rings for animation
     wormholeGroup.userData.rings = rings;
-    wormholeGroup.userData.glow = glowMesh;
 
     return wormholeGroup;
 }

@@ -44,6 +44,7 @@ export default function GalaxyModal({
         } else {
             reset();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [galaxy]);
 
     const submit: FormEventHandler = (e) => {

@@ -71,16 +71,6 @@ export default function WormholeModal({
     const weeklyRockets = activeRockets.filter((r) => r.mission.commitment_type === 'weekly');
     const monthlyRockets = activeRockets.filter((r) => r.mission.commitment_type === 'monthly');
 
-    const getPriorityColor = (priority: string) => {
-        const colors = {
-            critical: 'text-red-500',
-            high: 'text-orange-500',
-            medium: 'text-yellow-500',
-            low: 'text-blue-500',
-        };
-        return colors[priority as keyof typeof colors] || 'text-gray-500';
-    };
-
     const getPriorityBadgeColor = (priority: string) => {
         const colors = {
             critical: 'bg-red-500/20 text-red-400 border-red-500/50',

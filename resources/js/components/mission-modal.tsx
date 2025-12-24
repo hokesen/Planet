@@ -68,6 +68,7 @@ export default function MissionModal({
                 counts_toward_capacity: mission?.counts_toward_capacity ?? true,
             });
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [mission, isOpen, defaultPlanetId]);
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -156,7 +157,10 @@ export default function MissionModal({
                                                         planet.galaxyColor,
                                                 }}
                                             />
-                                            {planet.name} ({planet.galaxyName})
+                                            <span className="flex flex-col">
+                                                <span>{planet.name}</span>
+                                                <span className="text-xs text-muted-foreground">{planet.galaxyName}</span>
+                                            </span>
                                         </span>
                                     </SelectItem>
                                 ))}

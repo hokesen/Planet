@@ -75,7 +75,7 @@ export interface RocketInstance {
     angle: number; // Kept for compatibility
     orbitRadius: number; // Kept for compatibility
     speed: number;
-    trail?: THREE.Line;
+    trail?: THREE.Points;
     trailPositions?: THREE.Vector3[];
     pathLine?: THREE.Line; // Dotted line showing full travel path
     travelProgress: number; // 0-1 progress from home to planet

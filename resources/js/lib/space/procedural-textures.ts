@@ -137,11 +137,46 @@ function generateTerrainColors(seed: number) {
     const landG = Math.floor(100 + landHue * 60);
     const landB = Math.floor(30 + landHue * 50);
 
-    // Randomize ice caps (white to pale blue/cyan)
-    const iceHue = random(seed * 3.7);
-    const iceR = Math.floor(230 + iceHue * 25);
-    const iceG = Math.floor(240 + iceHue * 15);
-    const iceB = Math.floor(245 + random(seed * 3.9) * 10);
+    // Dramatically randomize ice caps - create truly alien variations
+    const iceColorType = random(seed * 3.7);
+    let iceR, iceG, iceB;
+
+    if (iceColorType < 0.15) {
+        // Pure white ice caps (like Earth)
+        iceR = Math.floor(250 + random(seed * 3.71) * 5);
+        iceG = Math.floor(250 + random(seed * 3.72) * 5);
+        iceB = Math.floor(250 + random(seed * 3.73) * 5);
+    } else if (iceColorType < 0.30) {
+        // Deep blue ice caps (frozen nitrogen)
+        iceR = Math.floor(150 + random(seed * 3.74) * 50);
+        iceG = Math.floor(180 + random(seed * 3.75) * 40);
+        iceB = Math.floor(240 + random(seed * 3.76) * 15);
+    } else if (iceColorType < 0.45) {
+        // Pink/magenta ice caps (frozen methane)
+        iceR = Math.floor(240 + random(seed * 3.77) * 15);
+        iceG = Math.floor(180 + random(seed * 3.78) * 40);
+        iceB = Math.floor(230 + random(seed * 3.79) * 25);
+    } else if (iceColorType < 0.60) {
+        // Amber/orange ice caps (sulfur deposits)
+        iceR = Math.floor(240 + random(seed * 3.80) * 15);
+        iceG = Math.floor(200 + random(seed * 3.81) * 40);
+        iceB = Math.floor(140 + random(seed * 3.82) * 50);
+    } else if (iceColorType < 0.75) {
+        // Mint/cyan ice caps (frozen ammonia)
+        iceR = Math.floor(180 + random(seed * 3.83) * 40);
+        iceG = Math.floor(240 + random(seed * 3.84) * 15);
+        iceB = Math.floor(220 + random(seed * 3.85) * 35);
+    } else if (iceColorType < 0.90) {
+        // Purple/violet ice caps (exotic compounds)
+        iceR = Math.floor(200 + random(seed * 3.86) * 40);
+        iceG = Math.floor(170 + random(seed * 3.87) * 50);
+        iceB = Math.floor(240 + random(seed * 3.88) * 15);
+    } else {
+        // Pale green ice caps (chlorine ice)
+        iceR = Math.floor(190 + random(seed * 3.89) * 40);
+        iceG = Math.floor(240 + random(seed * 3.90) * 15);
+        iceB = Math.floor(190 + random(seed * 3.91) * 40);
+    }
 
     return {
         deepOcean: { r: oceanR, g: oceanG, b: oceanB },
@@ -173,12 +208,29 @@ function getTerrainColor(
     height: number,
     latitude: number,
     terrainColors: ReturnType<typeof generateTerrainColors>,
-    jaggedNoise: number
+    jaggedNoise: number,
+    iceCapSize: number,
+    iceCapAsymmetry: number,
+    spiralNoise: number,
+    patchNoise: number
 ): TerrainColor {
-    // Ice caps at poles with jagged boundaries
+    // Ice caps at poles with much more dramatic variation
     const polarDistance = Math.abs(latitude);
-    // Add noise to ice cap boundary for jagged effect
-    const iceCapThreshold = 0.75 + jaggedNoise * 0.15;
+
+    // Ice cap size varies dramatically per planet (0.75 = huge caps, 0.95 = tiny caps)
+    // Range reduced by 2x - ice caps are now smaller
+    const baseThreshold = 0.75 + iceCapSize * 0.2;
+
+    // Asymmetric ice caps (north vs south poles can be different sizes)
+    const asymmetryFactor = latitude > 0 ? 1 + iceCapAsymmetry * 0.3 : 1 - iceCapAsymmetry * 0.3;
+
+    // Complex shape using multiple noise layers
+    const jaggedBoundary = jaggedNoise * 0.2; // Jagged edges
+    const spiralEffect = spiralNoise * 0.1; // Spiral patterns
+    const patchEffect = patchNoise > 0.6 ? 0.05 : 0; // Random patches
+
+    const iceCapThreshold = (baseThreshold + jaggedBoundary + spiralEffect + patchEffect) * asymmetryFactor;
+
     if (polarDistance > iceCapThreshold && height > 0.3) {
         return terrainColors.snowCap;
     }
@@ -229,6 +281,19 @@ export function generatePlanetTexture(
     // Generate randomized terrain colors for this planet
     const terrainColors = generateTerrainColors(planetSeed);
 
+    // Generate random ice cap parameters per planet
+    const random = (s: number) => {
+        const x = Math.sin(s) * 10000;
+        return x - Math.floor(x);
+    };
+    const iceCapSize = random(planetSeed * 5.1); // 0-1, controls overall ice cap size
+    const iceCapAsymmetry = random(planetSeed * 5.2); // 0-1, controls north/south asymmetry
+
+    // Random rotation angles for more continent variety
+    const rotationX = random(planetSeed * 5.3) * Math.PI * 2;
+    const rotationY = random(planetSeed * 5.4) * Math.PI * 2;
+    const rotationZ = random(planetSeed * 5.5) * Math.PI * 2;
+
     const imageData = ctx.createImageData(size, size);
     const data = imageData.data;
 
@@ -244,9 +309,28 @@ export function generatePlanetTexture(
             const lon = u * Math.PI * 2;     // 0 to 2π
 
             // Spherical to 3D coordinates
-            const sx = Math.cos(lat) * Math.cos(lon);
-            const sy = Math.cos(lat) * Math.sin(lon);
-            const sz = Math.sin(lat);
+            let sx = Math.cos(lat) * Math.cos(lon);
+            let sy = Math.cos(lat) * Math.sin(lon);
+            let sz = Math.sin(lat);
+
+            // Apply random rotation for more continent variety
+            // Rotation around X axis
+            let tempY = sy * Math.cos(rotationX) - sz * Math.sin(rotationX);
+            let tempZ = sy * Math.sin(rotationX) + sz * Math.cos(rotationX);
+            sy = tempY;
+            sz = tempZ;
+
+            // Rotation around Y axis
+            let tempX = sx * Math.cos(rotationY) + sz * Math.sin(rotationY);
+            tempZ = -sx * Math.sin(rotationY) + sz * Math.cos(rotationY);
+            sx = tempX;
+            sz = tempZ;
+
+            // Rotation around Z axis
+            tempX = sx * Math.cos(rotationZ) - sy * Math.sin(rotationZ);
+            tempY = sx * Math.sin(rotationZ) + sy * Math.cos(rotationZ);
+            sx = tempX;
+            sy = tempY;
 
             // Sample noise in 3D space (project to 2D)
             const scale = 4;
@@ -264,11 +348,22 @@ export function generatePlanetTexture(
             // Calculate latitude for ice caps (-1 to 1)
             const latitude = Math.sin(lat);
 
-            // Generate jagged noise for ice cap boundaries
+            // Generate multiple noise layers for complex ice cap shapes
             const jaggedNoise = octaveNoise(noise, lon * 8, lat * 8, 3, 0.5);
+            const spiralNoise = octaveNoise(noise, lon * 12 + lat * 6, lat * 12, 4, 0.6);
+            const patchNoise = octaveNoise(noise, lon * 16, lat * 16, 2, 0.4);
 
-            // Get terrain color
-            const color = getTerrainColor(normalizedHeight, latitude, terrainColors, jaggedNoise);
+            // Get terrain color with enhanced ice cap parameters
+            const color = getTerrainColor(
+                normalizedHeight,
+                latitude,
+                terrainColors,
+                jaggedNoise,
+                iceCapSize,
+                iceCapAsymmetry,
+                spiralNoise,
+                patchNoise
+            );
 
             // Add slight variation for texture
             const variation = octaveNoise(noise, sx * 20, sy * 20, 2, 0.3) * 10;

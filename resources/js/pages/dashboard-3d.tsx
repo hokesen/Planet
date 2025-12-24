@@ -123,88 +123,118 @@ export default function Dashboard3D({ galaxies, capacity }: Dashboard3DProps) {
                     onWormholeClick={handleWormholeClick}
                 />
 
-                {/* Info overlay - top left */}
-                <div className="absolute left-4 top-4 rounded-lg bg-black/70 p-4 text-white backdrop-blur-lg">
-                    <h2 className="mb-2 text-lg font-bold">
+                {/* Mission Control - Active Rockets Panel - top left */}
+                <div className="absolute left-4 top-4 max-h-[80vh] w-80 overflow-y-auto rounded-lg bg-black/70 p-4 text-white backdrop-blur-lg">
+                    <h2 className="mb-3 text-lg font-bold">
                         Mission Control
                     </h2>
-                    <div className="space-y-1 text-sm">
-                        <div>
-                            Galaxies: {galaxies.length}
-                        </div>
-                        <div>
-                            Planets:{' '}
-                            {galaxies.reduce(
-                                (sum, g) => sum + g.planets.length,
-                                0
-                            )}
-                        </div>
-                        <div className="font-semibold">
-                            Active Rockets:{' '}
-                            {galaxies.reduce((sum, g) => {
-                                return (
-                                    sum +
-                                    g.planets.reduce((pSum, p) => {
-                                        return (
-                                            pSum +
-                                            (p.missions?.filter(
-                                                (m) =>
-                                                    m.status !== 'completed' &&
-                                                    (m.commitment_type ===
-                                                        'daily' ||
-                                                        m.commitment_type ===
-                                                            'weekly' ||
-                                                        m.commitment_type ===
-                                                            'monthly')
-                                            ).length || 0)
-                                        );
-                                    }, 0)
-                                );
-                            }, 0)}
-                        </div>
-                        <div className="mt-3 border-t border-gray-600 pt-2 text-xs">
-                            <div className="flex items-center gap-1">
-                                <span className="text-red-400">●</span>
-                                Daily (fast orbit)
-                            </div>
-                            <div className="flex items-center gap-1">
-                                <span className="text-orange-400">●</span>
-                                Weekly (medium)
-                            </div>
-                            <div className="flex items-center gap-1">
-                                <span className="text-yellow-400">●</span>
-                                Monthly (slow)
-                            </div>
-                        </div>
-                        <div className="mt-3 text-xs text-gray-400">
-                            Phase 2: Orbiting Rockets
-                        </div>
-                    </div>
-                </div>
 
-                {/* Legend - bottom right */}
-                <div className="absolute bottom-4 right-4 rounded-lg bg-black/70 p-4 text-white backdrop-blur-lg">
-                    <h3 className="mb-2 text-sm font-bold">Legend</h3>
-                    <div className="space-y-1 text-xs">
-                        <div className="flex items-center gap-2">
-                            <div className="h-3 w-3 rounded-full bg-cyan-400"></div>
-                            <span>Home Base</span>
-                        </div>
-                        {galaxies.map((galaxy) => (
-                            <div
-                                key={galaxy.id}
-                                className="flex items-center gap-2"
-                            >
-                                <div
-                                    className="h-3 w-3 rounded-full"
-                                    style={{ backgroundColor: galaxy.color }}
-                                ></div>
-                                <span>
-                                    {galaxy.icon} {galaxy.name}
-                                </span>
+                    {(() => {
+                        // Collect all active rockets
+                        const activeRockets: Array<{
+                            mission: Mission3D;
+                            planet: Planet3D;
+                            galaxy: Galaxy3D;
+                        }> = [];
+
+                        galaxies.forEach((galaxy) => {
+                            galaxy.planets.forEach((planet) => {
+                                if (planet.missions) {
+                                    planet.missions.forEach((mission) => {
+                                        if (
+                                            mission.status !== 'completed' &&
+                                            (mission.commitment_type === 'daily' ||
+                                             mission.commitment_type === 'weekly' ||
+                                             mission.commitment_type === 'monthly')
+                                        ) {
+                                            activeRockets.push({ mission, planet, galaxy });
+                                        }
+                                    });
+                                }
+                            });
+                        });
+
+                        if (activeRockets.length === 0) {
+                            return (
+                                <div className="text-center text-sm text-gray-400">
+                                    No active rockets in flight
+                                </div>
+                            );
+                        }
+
+                        return (
+                            <div className="space-y-2">
+                                {activeRockets.map(({ mission, planet, galaxy }) => {
+                                    // Calculate fuel remaining (time until next occurrence)
+                                    const now = new Date();
+                                    const getNextOccurrence = () => {
+                                        const today = new Date(now);
+                                        today.setHours(0, 0, 0, 0);
+
+                                        if (mission.commitment_type === 'daily') {
+                                            const tomorrow = new Date(today);
+                                            tomorrow.setDate(tomorrow.getDate() + 1);
+                                            return tomorrow;
+                                        } else if (mission.commitment_type === 'weekly') {
+                                            const nextWeek = new Date(today);
+                                            nextWeek.setDate(nextWeek.getDate() + 7);
+                                            return nextWeek;
+                                        } else if (mission.commitment_type === 'monthly') {
+                                            const nextMonth = new Date(today);
+                                            nextMonth.setMonth(nextMonth.getMonth() + 1);
+                                            return nextMonth;
+                                        }
+                                        return null;
+                                    };
+
+                                    const nextOccurrence = getNextOccurrence();
+                                    const fuelRemaining = nextOccurrence
+                                        ? Math.max(0, Math.floor((nextOccurrence.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)))
+                                        : 0;
+                                    const priorityColors: Record<string, string> = {
+                                        critical: 'text-red-400',
+                                        high: 'text-orange-400',
+                                        medium: 'text-yellow-400',
+                                        low: 'text-blue-400',
+                                    };
+
+                                    return (
+                                        <div
+                                            key={mission.id}
+                                            className="cursor-pointer rounded border border-gray-600 bg-gray-900/50 p-2 text-xs transition-colors hover:bg-gray-800/50"
+                                            onClick={() => handleRocketClick(mission)}
+                                        >
+                                            <div className="flex items-start justify-between gap-2">
+                                                <div className="flex-1">
+                                                    <div className={`font-semibold ${priorityColors[mission.priority]}`}>
+                                                        {mission.title}
+                                                    </div>
+                                                    <div className="text-gray-400">
+                                                        {galaxy.icon} {galaxy.name} → {planet.name}
+                                                    </div>
+                                                    <div className="mt-1 flex items-center gap-2 text-gray-500">
+                                                        <span className="capitalize">{mission.commitment_type}</span>
+                                                        <span>•</span>
+                                                        <span>Fuel: {fuelRemaining}d remaining</span>
+                                                    </div>
+                                                </div>
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        // TODO: Implement refuel functionality
+                                                        alert('Refuel feature coming soon!');
+                                                    }}
+                                                    className="rounded bg-cyan-500/20 px-2 py-1 text-[10px] font-semibold text-cyan-400 hover:bg-cyan-500/30"
+                                                >
+                                                    Refuel
+                                                </button>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
                             </div>
-                        ))}
-                    </div>
+                        );
+                    })()}
                 </div>
 
                 {/* FAB (Floating Action Button) - center bottom */}

@@ -70,6 +70,7 @@ export default function PlanetModal({
                 target_completion_date: planet?.target_completion_date || '',
             });
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [planet, isOpen, defaultGalaxyId]);
 
     const handleSubmit = (e: React.FormEvent) => {

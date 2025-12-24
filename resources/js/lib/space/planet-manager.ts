@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import type { Galaxy3D, Planet3D, PlanetInstance, MoonInstance, Vector3D } from '@/types/space';
+import type { Galaxy3D, Planet3D, PlanetInstance, MoonInstance } from '@/types/space';
 import { getPlanetTexture } from './procedural-textures';
 import { calculateGalaxyCenter } from './black-hole-manager';
 
@@ -47,9 +47,6 @@ function getPlanetColor(planetId: number): string {
  * Planets are clustered by galaxy in 3D space
  */
 export function autoPositionPlanets(galaxies: Galaxy3D[]): void {
-    const galaxySpacing = 150;
-    let globalPlanetIndex = 0;
-
     galaxies.forEach((galaxy, gIndex) => {
         // Position galaxy center in circular pattern
         // For single galaxy, position at origin; for multiple, spread in circle
@@ -92,8 +89,6 @@ export function autoPositionPlanets(galaxies: Galaxy3D[]): void {
             if (!planet.color) {
                 planet.color = getPlanetColor(planet.id);
             }
-
-            globalPlanetIndex++;
         });
     });
 }

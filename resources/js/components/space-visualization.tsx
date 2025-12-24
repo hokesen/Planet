@@ -46,6 +46,12 @@ export function SpaceVisualization({
         lastTime: number;
     } | null>(null);
 
+    // Store callbacks in refs to avoid recreating the scene when they change
+    const callbacksRef = useRef({ onRocketClick, onPlanetClick, onGalaxyClick, onWormholeClick });
+    useEffect(() => {
+        callbacksRef.current = { onRocketClick, onPlanetClick, onGalaxyClick, onWormholeClick };
+    }, [onRocketClick, onPlanetClick, onGalaxyClick, onWormholeClick]);
+
     useEffect(() => {
         // SSR safety check
         if (typeof window === 'undefined') return;
@@ -97,10 +103,10 @@ export function SpaceVisualization({
             scene,
             canvas,
             {
-                onRocketClick,
-                onPlanetClick,
-                onGalaxyClick,
-                onWormholeClick,
+                onRocketClick: (mission) => callbacksRef.current.onRocketClick?.(mission),
+                onPlanetClick: (planet) => callbacksRef.current.onPlanetClick?.(planet),
+                onGalaxyClick: (galaxy) => callbacksRef.current.onGalaxyClick?.(galaxy),
+                onWormholeClick: () => callbacksRef.current.onWormholeClick?.(),
             }
         );
 

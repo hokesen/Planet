@@ -92,9 +92,9 @@ export function createBlackHole(galaxy: Galaxy3D, center: THREE.Vector3): THREE.
     // Position at galaxy center
     group.position.copy(center);
 
-    // Add galaxy name label above black hole
+    // Add galaxy name label at the top of the galaxy cluster
     const label = createTextSprite(galaxy.name, galaxyColor.getStyle());
-    label.position.y = blackHoleRadius + 10; // Position above black hole
+    label.position.y = 45; // Position at top of galaxy cluster
     group.add(label);
 
     // Store galaxy data for interaction

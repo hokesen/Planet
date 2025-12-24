@@ -19,6 +19,7 @@ export class InteractionHandler {
     private isDragging: boolean = false;
     private dragStart: THREE.Vector2 = new THREE.Vector2();
     private cameraAngle: number = 0;
+    private cameraDistance: number = 0;
 
     constructor(
         private camera: THREE.Camera,
@@ -29,11 +30,16 @@ export class InteractionHandler {
         this.raycaster = new THREE.Raycaster();
         this.mouse = new THREE.Vector2();
 
-        // Calculate initial camera angle
+        // Calculate initial camera angle and distance
         if (this.camera instanceof THREE.PerspectiveCamera) {
             this.cameraAngle = Math.atan2(
                 this.camera.position.z,
                 this.camera.position.x
+            );
+            this.cameraDistance = Math.sqrt(
+                this.camera.position.x ** 2 +
+                this.camera.position.y ** 2 +
+                this.camera.position.z ** 2
             );
         }
 
@@ -46,6 +52,7 @@ export class InteractionHandler {
         this.domElement.addEventListener('mousedown', this.onMouseDown.bind(this));
         this.domElement.addEventListener('mouseup', this.onMouseUp.bind(this));
         this.domElement.addEventListener('mouseleave', this.onMouseUp.bind(this));
+        this.domElement.addEventListener('wheel', this.onWheel.bind(this), { passive: false });
     }
 
     /**
@@ -132,6 +139,33 @@ export class InteractionHandler {
     }
 
     /**
+     * Handle wheel events (for zoom)
+     */
+    private onWheel(event: WheelEvent): void {
+        event.preventDefault();
+
+        if (this.camera instanceof THREE.PerspectiveCamera) {
+            // Zoom in/out by changing camera distance - 50x more powerful
+            const zoomSpeed = 0.05;
+            this.cameraDistance += event.deltaY * zoomSpeed;
+
+            // Clamp distance to reasonable values
+            this.cameraDistance = Math.max(50, Math.min(500, this.cameraDistance));
+
+            // Update camera position maintaining the current angle
+            const horizontalRadius = Math.sqrt(
+                this.camera.position.x ** 2 + this.camera.position.z ** 2
+            );
+            const verticalAngle = Math.atan2(this.camera.position.y, horizontalRadius);
+
+            this.camera.position.x = Math.cos(this.cameraAngle) * Math.cos(verticalAngle) * this.cameraDistance;
+            this.camera.position.y = Math.sin(verticalAngle) * this.cameraDistance;
+            this.camera.position.z = Math.sin(this.cameraAngle) * Math.cos(verticalAngle) * this.cameraDistance;
+            this.camera.lookAt(0, -10, 0);
+        }
+    }
+
+    /**
      * Handle mouse move events (for hover effects and dragging)
      */
     private onMouseMove(event: MouseEvent): void {
@@ -146,14 +180,15 @@ export class InteractionHandler {
             // Update camera angle based on drag (sensitivity: 0.005)
             this.cameraAngle -= deltaX * 0.005;
 
-            // Update camera position
+            // Update camera position maintaining the current distance
             if (this.camera instanceof THREE.PerspectiveCamera) {
-                const radius = Math.sqrt(
-                    this.camera.position.x ** 2 +
-                        this.camera.position.z ** 2
+                const horizontalRadius = Math.sqrt(
+                    this.camera.position.x ** 2 + this.camera.position.z ** 2
                 );
-                this.camera.position.x = Math.cos(this.cameraAngle) * radius;
-                this.camera.position.z = Math.sin(this.cameraAngle) * radius;
+                const verticalAngle = Math.atan2(this.camera.position.y, horizontalRadius);
+
+                this.camera.position.x = Math.cos(this.cameraAngle) * Math.cos(verticalAngle) * this.cameraDistance;
+                this.camera.position.z = Math.sin(this.cameraAngle) * Math.cos(verticalAngle) * this.cameraDistance;
                 this.camera.lookAt(0, -10, 0);
             }
 
@@ -294,6 +329,7 @@ export class InteractionHandler {
         this.domElement.removeEventListener('mousedown', this.onMouseDown.bind(this));
         this.domElement.removeEventListener('mouseup', this.onMouseUp.bind(this));
         this.domElement.removeEventListener('mouseleave', this.onMouseUp.bind(this));
+        this.domElement.removeEventListener('wheel', this.onWheel.bind(this));
 
         if (this.hoveredObject) {
             this.resetHoverEffect(this.hoveredObject);

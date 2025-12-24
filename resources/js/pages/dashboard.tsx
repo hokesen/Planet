@@ -335,7 +335,7 @@ export default function Dashboard({ galaxies }: { galaxies: Galaxy[] }) {
                                                             planetForm.setData(
                                                                 'size',
                                                                 e.target
-                                                                    .value as any,
+                                                                    .value as 'small' | 'medium' | 'large' | 'massive',
                                                             )
                                                         }
                                                         className="w-full rounded-md border px-3 py-2"
@@ -488,7 +488,7 @@ export default function Dashboard({ galaxies }: { galaxies: Galaxy[] }) {
                                                                             onChange={(e) =>
                                                                                 missionForm.setData(
                                                                                     'priority',
-                                                                                    e.target.value as any,
+                                                                                    e.target.value as 'low' | 'medium' | 'high' | 'critical',
                                                                                 )
                                                                             }
                                                                             className="w-full rounded-md border px-3 py-2"
@@ -508,7 +508,7 @@ export default function Dashboard({ galaxies }: { galaxies: Galaxy[] }) {
                                                                             onChange={(e) =>
                                                                                 missionForm.setData(
                                                                                     'status',
-                                                                                    e.target.value as any,
+                                                                                    e.target.value as 'pending' | 'in_progress' | 'completed' | 'blocked',
                                                                                 )
                                                                             }
                                                                             className="w-full rounded-md border px-3 py-2"
@@ -597,7 +597,7 @@ export default function Dashboard({ galaxies }: { galaxies: Galaxy[] }) {
                                                                                         onChange={(e) =>
                                                                                             missionForm.setData(
                                                                                                 'priority',
-                                                                                                e.target.value as any,
+                                                                                                e.target.value as 'low' | 'medium' | 'high' | 'critical',
                                                                                             )
                                                                                         }
                                                                                         className="rounded border px-2 py-1 text-sm"
@@ -612,7 +612,7 @@ export default function Dashboard({ galaxies }: { galaxies: Galaxy[] }) {
                                                                                         onChange={(e) =>
                                                                                             missionForm.setData(
                                                                                                 'status',
-                                                                                                e.target.value as any,
+                                                                                                e.target.value as 'pending' | 'in_progress' | 'completed' | 'blocked',
                                                                                             )
                                                                                         }
                                                                                         className="rounded border px-2 py-1 text-sm"

@@ -85,6 +85,7 @@ export function createGalaxyBoundary(
     const boundary = new THREE.LineSegments(wireframeGeometry, material);
     boundary.position.copy(center);
     boundary.computeLineDistances(); // Required for dashed lines
+    boundary.visible = false; // Hide galaxy boundaries
 
     // Store galaxy data for potential interaction
     boundary.userData = {

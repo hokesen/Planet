@@ -1,4 +1,5 @@
 import { BlackHoleManager } from '@/lib/space/black-hole-manager';
+import { CameraController, type CameraMode } from '@/lib/space/camera-controller';
 import {
     createAllGalaxyBoundaries,
     removeGalaxyBoundaries,
@@ -20,6 +21,7 @@ import * as THREE from 'three';
 
 export interface SpaceVisualizationProps {
     galaxies: Galaxy3D[];
+    cameraMode?: CameraMode;
     onRocketClick?: (mission: Mission3D) => void;
     onPlanetClick?: (planet: Planet3D) => void;
     onGalaxyClick?: (galaxy: Galaxy3D) => void;
@@ -28,6 +30,7 @@ export interface SpaceVisualizationProps {
 
 export function SpaceVisualization({
     galaxies,
+    cameraMode,
     onRocketClick,
     onPlanetClick,
     onGalaxyClick,
@@ -42,6 +45,7 @@ export function SpaceVisualization({
         rocketManager: RocketManager;
         blackHoleManager: BlackHoleManager;
         interactionHandler: InteractionHandler;
+        cameraController: CameraController;
         galaxyBoundaries: THREE.LineSegments[];
         animationId?: number;
         lastTime: number;
@@ -62,6 +66,13 @@ export function SpaceVisualization({
             onWormholeClick,
         };
     }, [onRocketClick, onPlanetClick, onGalaxyClick, onWormholeClick]);
+
+    // Update camera mode when prop changes
+    useEffect(() => {
+        if (sceneDataRef.current && cameraMode) {
+            sceneDataRef.current.cameraController.setMode(cameraMode);
+        }
+    }, [cameraMode]);
 
     useEffect(() => {
         // SSR safety check
@@ -90,8 +101,14 @@ export function SpaceVisualization({
         const planetManager = new PlanetManager(scene, galaxies);
         planetManager.initialize();
 
-        // Initialize rocket manager
-        const rocketManager = new RocketManager(scene);
+        // Initialize rocket manager with gravitational data
+        const galaxyCenters = planetManager.getGalaxyCenters();
+        const blackHoleMasses = blackHoleManager.getBlackHoleMasses();
+        const rocketManager = new RocketManager(
+            scene,
+            galaxyCenters,
+            blackHoleMasses,
+        );
 
         // Collect all missions from all galaxies
         const allMissions: Mission3D[] = [];
@@ -107,6 +124,14 @@ export function SpaceVisualization({
         rocketManager.initialize(allMissions, (planetId) => {
             return planetManager.getPlanet(planetId)?.planet;
         });
+
+        // Initialize camera controller
+        const cameraController = new CameraController(
+            camera,
+            galaxies,
+            (missionId) => rocketManager.getRocket(missionId),
+            () => planetManager.getGalaxyCenters(),
+        );
 
         // Initialize interaction handler
         const interactionHandler = new InteractionHandler(
@@ -124,6 +149,9 @@ export function SpaceVisualization({
             },
         );
 
+        // Connect interaction handler to camera controller
+        interactionHandler.setCameraController(cameraController);
+
         // Add galaxy boundaries
         const galaxyBoundaries = createAllGalaxyBoundaries(scene, galaxies);
 
@@ -136,6 +164,7 @@ export function SpaceVisualization({
             rocketManager,
             blackHoleManager,
             interactionHandler,
+            cameraController,
             galaxyBoundaries,
             lastTime: performance.now(),
         };
@@ -174,8 +203,19 @@ export function SpaceVisualization({
             // Update black holes (rotation, pulsing glow)
             sceneDataRef.current.blackHoleManager.update(deltaTime);
 
-            // Update rockets (linear travel, path lines)
+            // Update rocket manager with latest gravitational data
+            const blackHoleMasses =
+                sceneDataRef.current.blackHoleManager.getBlackHoleMasses();
+            sceneDataRef.current.rocketManager.updateGravitationalBodies(
+                galaxyCenters,
+                blackHoleMasses,
+            );
+
+            // Update rockets (orbital travel with physics-accurate paths)
             sceneDataRef.current.rocketManager.update(deltaTime);
+
+            // Update camera controller
+            sceneDataRef.current.cameraController.update(deltaTime);
 
             // Render scene
             sceneDataRef.current.renderer.render(
@@ -215,6 +255,7 @@ export function SpaceVisualization({
                 sceneDataRef.current.planetManager.dispose();
                 sceneDataRef.current.rocketManager.dispose();
                 sceneDataRef.current.interactionHandler.dispose();
+                sceneDataRef.current.cameraController.dispose();
                 removeGalaxyBoundaries(
                     sceneDataRef.current.scene,
                     sceneDataRef.current.galaxyBoundaries,

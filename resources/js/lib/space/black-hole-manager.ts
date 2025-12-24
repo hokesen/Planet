@@ -1,5 +1,6 @@
 import type { Galaxy3D } from '@/types/space';
 import * as THREE from 'three';
+import { calculateGM } from './planet-manager';
 
 /**
  * Create a text sprite label for galaxy name
@@ -104,6 +105,7 @@ export function createBlackHole(
     // Add galaxy name label at the top of the galaxy cluster
     const label = createTextSprite(galaxy.name, galaxyColor.getStyle());
     label.position.y = 45; // Position at top of galaxy cluster
+    label.visible = false; // Hide by default, show on hover
     group.add(label);
 
     // Store galaxy data for interaction
@@ -111,6 +113,7 @@ export function createBlackHole(
         type: 'black_hole',
         galaxy: galaxy,
         accretionDisk: accretionDisk,
+        label: label,
         glow: null,
     };
 
@@ -134,6 +137,11 @@ export class BlackHoleManager {
      */
     initialize(): void {
         this.galaxies.forEach((galaxy) => {
+            // Assign black hole mass for gravitational mechanics
+            const blackHoleMass = 1000; // Much more massive than planets
+            galaxy.blackHoleMass = blackHoleMass;
+            galaxy.blackHoleGM = calculateGM(blackHoleMass);
+
             const center = calculateGalaxyCenter(galaxy);
             this.galaxyCenters.set(galaxy.id, center);
 
@@ -155,6 +163,19 @@ export class BlackHoleManager {
      */
     getAllCenters(): Map<number, THREE.Vector3> {
         return this.galaxyCenters;
+    }
+
+    /**
+     * Get black hole masses for all galaxies
+     */
+    getBlackHoleMasses(): Map<number, number> {
+        const masses = new Map<number, number>();
+        this.galaxies.forEach((galaxy) => {
+            if (galaxy.blackHoleMass !== undefined) {
+                masses.set(galaxy.id, galaxy.blackHoleMass);
+            }
+        });
+        return masses;
     }
 
     /**

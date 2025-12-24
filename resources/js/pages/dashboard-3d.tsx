@@ -1,9 +1,11 @@
+import { CameraControlDropdown } from '@/components/camera-control-dropdown';
 import GalaxyModal from '@/components/galaxy-modal';
 import MissionModal from '@/components/mission-modal';
 import PlanetModal from '@/components/planet-modal';
 import { SpaceVisualization } from '@/components/space-visualization';
 import { Button } from '@/components/ui/button';
 import WormholeModal from '@/components/wormhole-modal';
+import type { CameraMode } from '@/lib/space/camera-controller';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import type { BreadcrumbItem } from '@/types';
@@ -65,6 +67,7 @@ export default function Dashboard3D({ galaxies, capacity }: Dashboard3DProps) {
     const [showWormholeModal, setShowWormholeModal] = useState(false);
     const [showFabMenu, setShowFabMenu] = useState(false);
     const [isFullscreen, setIsFullscreen] = useState(false);
+    const [cameraMode, setCameraMode] = useState<CameraMode>({ type: 'wormhole' });
 
     // Fullscreen functionality
     const toggleFullscreen = () => {
@@ -158,6 +161,7 @@ export default function Dashboard3D({ galaxies, capacity }: Dashboard3DProps) {
                 {/* Full-screen 3D canvas */}
                 <SpaceVisualization
                     galaxies={galaxies}
+                    cameraMode={cameraMode}
                     onRocketClick={handleRocketClick}
                     onPlanetClick={handlePlanetClick}
                     onGalaxyClick={handleGalaxyClick}
@@ -183,6 +187,15 @@ export default function Dashboard3D({ galaxies, capacity }: Dashboard3DProps) {
                             <Maximize2 className="h-4 w-4" />
                         )}
                     </Button>
+                </div>
+
+                {/* Camera control dropdown - bottom right */}
+                <div className="absolute bottom-6 right-6 z-10">
+                    <CameraControlDropdown
+                        cameraMode={cameraMode}
+                        onCameraModeChange={setCameraMode}
+                        galaxies={galaxies}
+                    />
                 </div>
 
                 {/* Mission Control - Active Rockets Panel - top left */}

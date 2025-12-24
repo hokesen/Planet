@@ -31,6 +31,28 @@ export function getOrbitRadius(size: string): number {
 }
 
 /**
+ * Get planet mass based on size (for orbital mechanics)
+ */
+export function getPlanetMass(size: string): number {
+    const masses = {
+        small: 1.0, // Baseline mass
+        medium: 5.0,
+        large: 15.0,
+        massive: 50.0,
+    };
+
+    return masses[size as keyof typeof masses] || 5.0;
+}
+
+/**
+ * Calculate gravitational parameter (GM) from mass
+ */
+export function calculateGM(mass: number): number {
+    const G = 1.0; // Normalized gravitational constant
+    return G * mass;
+}
+
+/**
  * Generate a randomized color for each planet based on its ID
  */
 function getPlanetColor(planetId: number): string {
@@ -383,6 +405,10 @@ export class PlanetManager {
             const galaxyCenter = this.galaxyCenters.get(galaxy.id)!;
 
             galaxy.planets.forEach((planet) => {
+                // Calculate and assign mass properties for orbital mechanics
+                planet.mass = getPlanetMass(planet.size);
+                planet.gm = calculateGM(planet.mass);
+
                 const mesh = createPlanet(planet, galaxy.color);
                 addPlanetEffects(mesh, planet);
 
@@ -404,12 +430,13 @@ export class PlanetManager {
                 );
                 const orbitSpeed = getOrbitalSpeed(planet.size, orbitDistance);
 
-                // Create orbit line
+                // Create orbit line (hidden)
                 const orbitLine = createOrbitLine(
                     galaxyCenter,
                     orbitDistance,
                     planet.color || galaxy.color,
                 );
+                orbitLine.visible = false;
                 this.scene.add(orbitLine);
 
                 // Create and add moons

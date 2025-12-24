@@ -1,3 +1,4 @@
+import type { CameraController } from '@/lib/space/camera-controller';
 import type { Galaxy3D, Mission3D, Planet3D } from '@/types/space';
 import * as THREE from 'three';
 
@@ -18,8 +19,9 @@ export class InteractionHandler {
     private hoveredObject: THREE.Object3D | null = null;
     private isDragging: boolean = false;
     private dragStart: THREE.Vector2 = new THREE.Vector2();
-    private cameraAngle: number = 0;
-    private cameraDistance: number = 0;
+    private lastDragPosition: THREE.Vector2 = new THREE.Vector2();
+    private dragVelocity: number = 0;
+    private cameraController: CameraController | null = null;
 
     constructor(
         private camera: THREE.Camera,
@@ -29,19 +31,6 @@ export class InteractionHandler {
     ) {
         this.raycaster = new THREE.Raycaster();
         this.mouse = new THREE.Vector2();
-
-        // Calculate initial camera angle and distance
-        if (this.camera instanceof THREE.PerspectiveCamera) {
-            this.cameraAngle = Math.atan2(
-                this.camera.position.z,
-                this.camera.position.x,
-            );
-            this.cameraDistance = Math.sqrt(
-                this.camera.position.x ** 2 +
-                    this.camera.position.y ** 2 +
-                    this.camera.position.z ** 2,
-            );
-        }
 
         // Bind event listeners
         this.domElement.addEventListener('click', this.onClick.bind(this));
@@ -97,6 +86,11 @@ export class InteractionHandler {
                 const { type, mission, planet, galaxy } =
                     clickedObject.userData;
 
+                // Disable manual camera control when clicking on objects
+                if (this.cameraController) {
+                    this.cameraController.disableManualControl();
+                }
+
                 if (
                     type === 'rocket' &&
                     mission &&
@@ -135,7 +129,11 @@ export class InteractionHandler {
      */
     private onMouseDown(event: MouseEvent): void {
         const rect = this.domElement.getBoundingClientRect();
-        this.dragStart.set(event.clientX - rect.left, event.clientY - rect.top);
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        this.dragStart.set(x, y);
+        this.lastDragPosition.set(x, y);
+        this.dragVelocity = 0;
         this.isDragging = true;
         this.domElement.style.cursor = 'grabbing';
     }
@@ -154,37 +152,19 @@ export class InteractionHandler {
     private onWheel(event: WheelEvent): void {
         event.preventDefault();
 
-        if (this.camera instanceof THREE.PerspectiveCamera) {
-            // Zoom in/out by changing camera distance - 50x more powerful
+        if (this.camera instanceof THREE.PerspectiveCamera && this.cameraController) {
+            // Get current distance from camera controller
+            let cameraDistance = this.cameraController.getCameraDistance();
+
+            // Zoom in/out by changing camera distance
             const zoomSpeed = 0.05;
-            this.cameraDistance += event.deltaY * zoomSpeed;
+            cameraDistance += event.deltaY * zoomSpeed;
 
             // Clamp distance to reasonable values
-            this.cameraDistance = Math.max(
-                50,
-                Math.min(500, this.cameraDistance),
-            );
+            cameraDistance = Math.max(50, Math.min(500, cameraDistance));
 
-            // Update camera position maintaining the current angle
-            const horizontalRadius = Math.sqrt(
-                this.camera.position.x ** 2 + this.camera.position.z ** 2,
-            );
-            const verticalAngle = Math.atan2(
-                this.camera.position.y,
-                horizontalRadius,
-            );
-
-            this.camera.position.x =
-                Math.cos(this.cameraAngle) *
-                Math.cos(verticalAngle) *
-                this.cameraDistance;
-            this.camera.position.y =
-                Math.sin(verticalAngle) * this.cameraDistance;
-            this.camera.position.z =
-                Math.sin(this.cameraAngle) *
-                Math.cos(verticalAngle) *
-                this.cameraDistance;
-            this.camera.lookAt(0, -10, 0);
+            // Update camera controller
+            this.cameraController.updateManualDistance(cameraDistance);
         }
     }
 
@@ -195,36 +175,28 @@ export class InteractionHandler {
         this.updateMousePosition(event);
 
         // Handle camera drag rotation
-        if (this.isDragging) {
+        if (this.isDragging && this.cameraController) {
             const rect = this.domElement.getBoundingClientRect();
             const currentX = event.clientX - rect.left;
+            const currentY = event.clientY - rect.top;
             const deltaX = currentX - this.dragStart.x;
 
+            // Calculate drag velocity (pixels moved since last frame)
+            const velocityX = Math.abs(currentX - this.lastDragPosition.x);
+            const velocityY = Math.abs(currentY - this.lastDragPosition.y);
+            this.dragVelocity = Math.sqrt(velocityX * velocityX + velocityY * velocityY);
+
+            // Get current angle from camera controller
+            let cameraAngle = this.cameraController.getCameraAngle();
+
             // Update camera angle based on drag (sensitivity: 0.005)
-            this.cameraAngle -= deltaX * 0.005;
+            cameraAngle -= deltaX * 0.005;
 
-            // Update camera position maintaining the current distance
-            if (this.camera instanceof THREE.PerspectiveCamera) {
-                const horizontalRadius = Math.sqrt(
-                    this.camera.position.x ** 2 + this.camera.position.z ** 2,
-                );
-                const verticalAngle = Math.atan2(
-                    this.camera.position.y,
-                    horizontalRadius,
-                );
-
-                this.camera.position.x =
-                    Math.cos(this.cameraAngle) *
-                    Math.cos(verticalAngle) *
-                    this.cameraDistance;
-                this.camera.position.z =
-                    Math.sin(this.cameraAngle) *
-                    Math.cos(verticalAngle) *
-                    this.cameraDistance;
-                this.camera.lookAt(0, -10, 0);
-            }
+            // Update camera controller with velocity information
+            this.cameraController.updateManualAngle(cameraAngle, this.dragVelocity);
 
             this.dragStart.x = currentX;
+            this.lastDragPosition.set(currentX, currentY);
             return;
         }
 
@@ -298,6 +270,10 @@ export class InteractionHandler {
         } else if (object.userData.type === 'black_hole') {
             // Scale up slightly on hover
             object.scale.set(1.2, 1.2, 1.2);
+            // Show galaxy label on hover
+            if (object.userData.label) {
+                object.userData.label.visible = true;
+            }
         } else if (object.userData.type === 'home_base') {
             // Brighten wormhole on hover
             object.scale.set(1.1, 1.1, 1.1);
@@ -328,6 +304,10 @@ export class InteractionHandler {
         } else if (object.userData.type === 'black_hole') {
             // Reset scale
             object.scale.set(1, 1, 1);
+            // Hide galaxy label when not hovering
+            if (object.userData.label) {
+                object.userData.label.visible = false;
+            }
         } else if (object.userData.type === 'home_base') {
             // Reset wormhole
             object.scale.set(1, 1, 1);
@@ -338,17 +318,10 @@ export class InteractionHandler {
     }
 
     /**
-     * Get current camera angle (for external use)
+     * Set camera controller (for coordinating manual camera control)
      */
-    getCameraAngle(): number {
-        return this.cameraAngle;
-    }
-
-    /**
-     * Set camera angle (for external use)
-     */
-    setCameraAngle(angle: number): void {
-        this.cameraAngle = angle;
+    setCameraController(controller: CameraController): void {
+        this.cameraController = controller;
     }
 
     /**

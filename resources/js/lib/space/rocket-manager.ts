@@ -1,5 +1,12 @@
-import type { Mission3D, Planet3D, RocketInstance } from '@/types/space';
+import type {
+    Mission3D,
+    OrbitalPathSegment,
+    Planet3D,
+    RocketInstance,
+} from '@/types/space';
 import * as THREE from 'three';
+import { calculateGravityAssist } from './orbital-mechanics';
+import { generateOrbitalPath, shouldRecalculatePath } from './path-generator';
 
 /**
  * Get rocket speed based on commitment type
@@ -213,8 +220,17 @@ function createRocketPathLine(
  */
 export class RocketManager {
     private rockets: Map<number, RocketInstance> = new Map();
+    private galaxyCenters: Map<number, THREE.Vector3> = new Map();
+    private blackHoleMasses: Map<number, number> = new Map();
 
-    constructor(private scene: THREE.Scene) {}
+    constructor(
+        private scene: THREE.Scene,
+        galaxyCenters?: Map<number, THREE.Vector3>,
+        blackHoleMasses?: Map<number, number>,
+    ) {
+        this.galaxyCenters = galaxyCenters || new Map();
+        this.blackHoleMasses = blackHoleMasses || new Map();
+    }
 
     /**
      * Initialize rockets for all active missions
@@ -320,122 +336,176 @@ export class RocketManager {
      */
     update(deltaTime: number): void {
         this.rockets.forEach((rocket) => {
-            const homePos = new THREE.Vector3(0, 0, 0);
+            // Check if path needs recalculation
+            if (this.pathNeedsRecalculation(rocket)) {
+                this.calculateRocketPath(rocket);
 
-            // Determine current segment's start and end positions
-            let startPos: THREE.Vector3;
-            let endPos: THREE.Vector3;
+                // Update path line visualization with new orbital waypoints
+                if (rocket.orbitalPath && rocket.pathLine) {
+                    const orbitalPoints: THREE.Vector3[] = [];
+                    rocket.orbitalPath.forEach((segment) => {
+                        orbitalPoints.push(...segment.waypoints);
+                    });
 
-            if (rocket.route && rocket.route.length > 1) {
-                // Multi-planet route
-                const totalSegments = rocket.route.length + 1; // +1 for return to home
-                const segment = rocket.currentSegment ?? 0;
-
-                if (segment === 0) {
-                    // First segment: Home → First Planet
-                    startPos = homePos;
-                    endPos = new THREE.Vector3(
-                        rocket.route[0].position_x || 0,
-                        rocket.route[0].position_y || 0,
-                        rocket.route[0].position_z || 0,
-                    );
-                } else if (segment < rocket.route.length) {
-                    // Middle segments: Planet N → Planet N+1
-                    const prevPlanet = rocket.route[segment - 1];
-                    const nextPlanet = rocket.route[segment];
-                    startPos = new THREE.Vector3(
-                        prevPlanet.position_x || 0,
-                        prevPlanet.position_y || 0,
-                        prevPlanet.position_z || 0,
-                    );
-                    endPos = new THREE.Vector3(
-                        nextPlanet.position_x || 0,
-                        nextPlanet.position_y || 0,
-                        nextPlanet.position_z || 0,
-                    );
-                } else {
-                    // Last segment: Last Planet → Home
-                    const lastPlanet = rocket.route[rocket.route.length - 1];
-                    startPos = new THREE.Vector3(
-                        lastPlanet.position_x || 0,
-                        lastPlanet.position_y || 0,
-                        lastPlanet.position_z || 0,
-                    );
-                    endPos = homePos;
-                }
-
-                // Update path line to follow moving planets
-                if (rocket.pathLine) {
-                    const positions =
-                        rocket.pathLine.geometry.getAttribute('position');
-                    positions.setXYZ(0, homePos.x, homePos.y, homePos.z);
-                    for (let i = 0; i < rocket.route.length; i++) {
-                        const planet = rocket.route[i];
-                        positions.setXYZ(
-                            i + 1,
-                            planet.position_x || 0,
-                            planet.position_y || 0,
-                            planet.position_z || 0,
-                        );
+                    // Dispose old path line
+                    this.scene.remove(rocket.pathLine);
+                    rocket.pathLine.geometry.dispose();
+                    if (rocket.pathLine.material instanceof THREE.Material) {
+                        rocket.pathLine.material.dispose();
                     }
-                    positions.setXYZ(
-                        rocket.route.length + 1,
-                        homePos.x,
-                        homePos.y,
-                        homePos.z,
+
+                    // Create new path line with updated waypoints
+                    const newPathLine = createRocketPathLine(
+                        orbitalPoints,
+                        getPriorityColor(rocket.mission.priority),
                     );
-                    positions.needsUpdate = true;
-                    rocket.pathLine.computeLineDistances();
+                    this.scene.add(newPathLine);
+                    rocket.pathLine = newPathLine;
                 }
-            } else {
-                // Single planet (backward compatibility)
-                startPos = homePos;
-                endPos = new THREE.Vector3(
-                    rocket.planet.position_x || 0,
-                    rocket.planet.position_y || 0,
-                    rocket.planet.position_z || 0,
+            }
+
+            // Use orbital path if available, otherwise fallback to linear
+            if (rocket.orbitalPath && rocket.orbitalPath.length > 0) {
+                // ORBITAL PATH FOLLOWING
+                const currentSegmentIndex =
+                    rocket.currentPathSegment ?? 0;
+                const segment =
+                    rocket.orbitalPath[currentSegmentIndex];
+
+                if (!segment) {
+                    return; // Invalid segment, skip this rocket
+                }
+
+                // Calculate current speed with gravitational assists
+                let currentSpeed = rocket.speed * segment.baseSpeed;
+
+                // Apply gravitational assist if in influence radius
+                if (segment.assistBody) {
+                    const speedMultiplier = calculateGravityAssist(
+                        rocket.mesh.position,
+                        segment.assistBody.position,
+                        segment.assistBody.mass,
+                        segment.assistBody.influenceRadius,
+                    );
+                    currentSpeed *= speedMultiplier;
+
+                    // Visual feedback for gravity assist
+                    if (speedMultiplier > 1.2) {
+                        this.boostEngineGlow(rocket, speedMultiplier);
+                    }
+                }
+
+                // Update progress along current segment
+                const normalizedSpeed = currentSpeed * 0.05;
+                const segmentProgress = (rocket.segmentProgress ?? 0) + normalizedSpeed * deltaTime;
+                rocket.segmentProgress = segmentProgress;
+
+                // Check if segment is complete
+                if (rocket.segmentProgress >= 1.0) {
+                    rocket.segmentProgress = 0;
+                    rocket.currentPathSegment =
+                        (currentSegmentIndex + 1) % rocket.orbitalPath.length;
+                }
+
+                // Interpolate position along waypoints
+                const waypoints = segment.waypoints;
+                const waypointIndex = Math.floor(
+                    rocket.segmentProgress * (waypoints.length - 1),
+                );
+                const waypointT =
+                    rocket.segmentProgress * (waypoints.length - 1) -
+                    waypointIndex;
+
+                const currentWaypoint = waypoints[waypointIndex];
+                const nextWaypoint =
+                    waypoints[Math.min(waypointIndex + 1, waypoints.length - 1)];
+
+                rocket.mesh.position.lerpVectors(
+                    currentWaypoint,
+                    nextWaypoint,
+                    waypointT,
                 );
 
-                // Update path line to follow moving planet
-                if (rocket.pathLine) {
-                    const positions =
-                        rocket.pathLine.geometry.getAttribute('position');
-                    positions.setXYZ(0, homePos.x, homePos.y, homePos.z);
-                    positions.setXYZ(1, endPos.x, endPos.y, endPos.z);
-                    positions.setXYZ(2, homePos.x, homePos.y, homePos.z);
-                    positions.needsUpdate = true;
-                    rocket.pathLine.computeLineDistances();
-                }
-            }
+                // Orient rocket along path (look ahead for smooth rotation)
+                const lookAheadIndex = Math.min(
+                    waypointIndex + 2,
+                    waypoints.length - 1,
+                );
+                rocket.mesh.lookAt(waypoints[lookAheadIndex]);
+            } else {
+                // FALLBACK: Linear interpolation (backward compatibility)
+                const homePos = new THREE.Vector3(0, 0, 0);
+                let startPos: THREE.Vector3;
+                let endPos: THREE.Vector3;
 
-            // Update travel progress
-            const normalizedSpeed = rocket.speed * 0.05;
-            rocket.travelProgress += normalizedSpeed * deltaTime;
-
-            // Check if segment is complete
-            if (rocket.travelProgress >= 1) {
-                rocket.travelProgress = 0;
-
-                if (rocket.route && rocket.route.length > 1) {
-                    // Move to next segment
+                if (rocket.route && rocket.route.length > 0) {
                     const totalSegments = rocket.route.length + 1;
-                    rocket.currentSegment =
-                        ((rocket.currentSegment ?? 0) + 1) % totalSegments;
+                    const segment = rocket.currentSegment ?? 0;
+
+                    if (segment === 0) {
+                        startPos = homePos;
+                        endPos = new THREE.Vector3(
+                            rocket.route[0].position_x || 0,
+                            rocket.route[0].position_y || 0,
+                            rocket.route[0].position_z || 0,
+                        );
+                    } else if (segment < rocket.route.length) {
+                        const prevPlanet = rocket.route[segment - 1];
+                        const nextPlanet = rocket.route[segment];
+                        startPos = new THREE.Vector3(
+                            prevPlanet.position_x || 0,
+                            prevPlanet.position_y || 0,
+                            prevPlanet.position_z || 0,
+                        );
+                        endPos = new THREE.Vector3(
+                            nextPlanet.position_x || 0,
+                            nextPlanet.position_y || 0,
+                            nextPlanet.position_z || 0,
+                        );
+                    } else {
+                        const lastPlanet = rocket.route[rocket.route.length - 1];
+                        startPos = new THREE.Vector3(
+                            lastPlanet.position_x || 0,
+                            lastPlanet.position_y || 0,
+                            lastPlanet.position_z || 0,
+                        );
+                        endPos = homePos;
+                    }
+                } else {
+                    startPos = homePos;
+                    endPos = new THREE.Vector3(
+                        rocket.planet.position_x || 0,
+                        rocket.planet.position_y || 0,
+                        rocket.planet.position_z || 0,
+                    );
                 }
+
+                const normalizedSpeed = rocket.speed * 0.05;
+                rocket.travelProgress += normalizedSpeed * deltaTime;
+
+                if (rocket.travelProgress >= 1) {
+                    rocket.travelProgress = 0;
+                    if (rocket.route && rocket.route.length > 0) {
+                        const totalSegments = rocket.route.length + 1;
+                        rocket.currentSegment =
+                            ((rocket.currentSegment ?? 0) + 1) % totalSegments;
+                    }
+                }
+
+                rocket.mesh.position.lerpVectors(
+                    startPos,
+                    endPos,
+                    rocket.travelProgress,
+                );
+
+                const lookAheadProgress = Math.min(
+                    1,
+                    rocket.travelProgress + 0.02,
+                );
+                const targetPos = new THREE.Vector3();
+                targetPos.lerpVectors(startPos, endPos, lookAheadProgress);
+                rocket.mesh.lookAt(targetPos);
             }
-
-            // Linear interpolation between start and end of current segment
-            rocket.mesh.position.lerpVectors(
-                startPos,
-                endPos,
-                rocket.travelProgress,
-            );
-
-            // Orient rocket towards direction of travel
-            const lookAheadProgress = Math.min(1, rocket.travelProgress + 0.02);
-            const targetPos = new THREE.Vector3();
-            targetPos.lerpVectors(startPos, endPos, lookAheadProgress);
-            rocket.mesh.lookAt(targetPos);
 
             // Pulse the engine glow - need to search in nested group
             const rocketMesh = rocket.mesh.children[0]; // First child is the rocketMesh group
@@ -545,6 +615,77 @@ export class RocketManager {
     }
 
     /**
+     * Calculate and set orbital path for a rocket
+     */
+    private calculateRocketPath(rocket: RocketInstance): void {
+        if (!rocket.route || rocket.route.length === 0) {
+            return;
+        }
+
+        const homePos = new THREE.Vector3(0, 0, 0);
+
+        // Generate orbital path using Keplerian mechanics
+        rocket.orbitalPath = generateOrbitalPath(
+            rocket.route,
+            homePos,
+            this.galaxyCenters,
+            this.blackHoleMasses,
+        );
+
+        // Scale speeds by mission type
+        const speedMultiplier = rocket.speed;
+        rocket.orbitalPath.forEach((segment) => {
+            segment.baseSpeed = speedMultiplier;
+        });
+
+        // Initialize path traversal
+        rocket.currentPathSegment = 0;
+        rocket.segmentProgress = 0;
+        rocket.lastPathUpdateTime = Date.now();
+        rocket.needsPathRecalculation = false;
+    }
+
+    /**
+     * Check if a rocket's path needs recalculation
+     */
+    private pathNeedsRecalculation(rocket: RocketInstance): boolean {
+        if (!rocket.orbitalPath || !rocket.lastPathUpdateTime) {
+            return true; // No path exists yet
+        }
+
+        // Time-based check: recalculate every 30 seconds
+        const now = Date.now();
+        if (now - rocket.lastPathUpdateTime > 30000) {
+            return true;
+        }
+
+        // Position-based check: if planets in route have moved significantly
+        if (rocket.route) {
+            const needsRecalc = shouldRecalculatePath(
+                rocket.route,
+                rocket.orbitalPath,
+                5, // Threshold: 5 units
+            );
+            if (needsRecalc) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Update galaxy centers and black hole masses (called from scene update)
+     */
+    updateGravitationalBodies(
+        galaxyCenters: Map<number, THREE.Vector3>,
+        blackHoleMasses: Map<number, number>,
+    ): void {
+        this.galaxyCenters = galaxyCenters;
+        this.blackHoleMasses = blackHoleMasses;
+    }
+
+    /**
      * Add a new rocket for a mission
      */
     addRocket(
@@ -594,7 +735,7 @@ export class RocketManager {
         const trail = createTrail(getPriorityColor(mission.priority));
         this.scene.add(trail);
 
-        // Create dotted path line showing full route
+        // Create placeholder path line (will be updated with orbital path)
         const homePos = new THREE.Vector3(0, 0, 0);
         const pathPoints: THREE.Vector3[] = [homePos];
         for (const routePlanet of route) {
@@ -618,7 +759,7 @@ export class RocketManager {
             mesh,
             mission,
             planet,
-            route: route.length > 1 ? route : undefined, // Only set if multi-planet
+            route, // Always set route for orbital mechanics
             currentSegment: 0,
             angle: 0, // Kept for compatibility
             orbitRadius,
@@ -629,6 +770,31 @@ export class RocketManager {
             travelProgress: 0, // Start at home
             direction: 1, // Moving towards planet
         };
+
+        // Calculate orbital path and update visualization
+        this.calculateRocketPath(instance);
+
+        // Update path line with curved orbital waypoints
+        if (instance.orbitalPath) {
+            this.scene.remove(pathLine);
+            pathLine.geometry.dispose();
+            if (pathLine.material instanceof THREE.Material) {
+                pathLine.material.dispose();
+            }
+
+            // Create new path line from orbital waypoints
+            const orbitalPoints: THREE.Vector3[] = [];
+            instance.orbitalPath.forEach((segment) => {
+                orbitalPoints.push(...segment.waypoints);
+            });
+
+            const newPathLine = createRocketPathLine(
+                orbitalPoints,
+                getPriorityColor(mission.priority),
+            );
+            this.scene.add(newPathLine);
+            instance.pathLine = newPathLine;
+        }
 
         this.rockets.set(mission.id, instance);
     }
@@ -671,6 +837,38 @@ export class RocketManager {
         });
 
         this.rockets.delete(missionId);
+    }
+
+    /**
+     * Boost engine glow during gravitational assists
+     */
+    private boostEngineGlow(
+        rocket: RocketInstance,
+        speedMultiplier: number,
+    ): void {
+        const rocketMesh = rocket.mesh.children[0];
+        if (!rocketMesh) return;
+
+        const glow = rocketMesh.children.find(
+            (child) => child instanceof THREE.Sprite,
+        ) as THREE.Sprite | undefined;
+
+        if (glow && glow.material instanceof THREE.SpriteMaterial) {
+            // Boost intensity based on speed multiplier
+            const boostIntensity = (speedMultiplier - 1.0) / 1.5; // 0-1 range
+            glow.material.opacity = 0.6 + boostIntensity * 0.4; // 0.6 to 1.0
+            glow.scale.set(1 + boostIntensity, 1 + boostIntensity, 1);
+
+            // Shift color toward white for higher speeds
+            const baseColor = new THREE.Color(
+                getPriorityColor(rocket.mission.priority),
+            );
+            const boostedColor = new THREE.Color(baseColor).lerp(
+                new THREE.Color(0xffffff),
+                boostIntensity * 0.5,
+            );
+            glow.material.color = boostedColor;
+        }
     }
 
     /**
